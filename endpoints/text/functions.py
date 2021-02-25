@@ -4,6 +4,14 @@ summarizer = pipeline("summarization", model="t5-small", tokenizer="t5-small", f
 def summary(text_input, aim=50, deviation_input=10, num_summaries=1):
     # text_input = "This is an input text for the summarizer"
 
+    if num_summaries > 1:
+        min_length = [0] * num_summaries
+        max_length = [0] * num_summaries
+
+        for i in range(num_summaries):
+            min_length[i] = aim + i*deviation_input
+            max_length[i] = aim + (i+1)*deviation_input
+
     text_input_length = len(list(text_input.split()))
     aim_rel = aim/100
 
@@ -22,6 +30,7 @@ def summary(text_input, aim=50, deviation_input=10, num_summaries=1):
     text_length = len(list(text.split()))
     compression = text_length / text_input_length
     deviation_output = abs(compression - aim_rel)
+
     print("compression:", compression)
     print("aim", aim_rel)
     print("deviation:", deviation_output)
