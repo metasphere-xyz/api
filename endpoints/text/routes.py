@@ -39,11 +39,24 @@ def summarize():
     # JSON -> JSON
     if request.content_type == json and accept_json==1:
         if request.is_json:
-            text = request.json.get("text")
-            text, compression, aim_rel, deviation_output = summary(text, aim=20, num_summaries=2)
-            # response = Response(summary_result, mimetype=json)
+            # text = request.json.get("text")
+            req_json = request.get_json()
+            chunk_number = len(req_json['chunk_sequence'])
+            print(chunk_number)
+
+            text_chunk = [""] * chunk_number
+            compression = [0] * chunk_number
+            aim_rel = [0] * chunk_number
+            deviation_output = [0] * chunk_number
+
+            for i in range(chunk_number):
+                text = req_json['chunk_sequence'][i]['text']
+                text_chunk[i], compression[i], aim_rel[i], deviation_output[i] = summary(text, aim=20, num_summaries=2)
+
+            # text, compression, aim_rel, deviation_output = summary(text, aim=20, num_summaries=2)
+
             data = {
-                "text": text,
+                "text": text_chunk,
                 "compression": compression,
                 "aim_rel": aim_rel,
                 "deviation_output": deviation_output
