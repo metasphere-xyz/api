@@ -40,8 +40,16 @@ def summarize():
     if request.content_type == json and accept_json==1:
         if request.is_json:
             text = request.json.get("text")
-            summary_result = summary(text, aim=20, deviation_input=15, num_summaries=3)
-            response = Response(summary_result, mimetype=json)
+            text, compression, aim_rel, deviation_output = summary(text, aim=20, num_summaries=2)
+            # response = Response(summary_result, mimetype=json)
+            data = {
+                "text": text,
+                "compression": compression,
+                "aim_rel": aim_rel,
+                "deviation_output": deviation_output
+                }
+            response = make_response(data)
+            response.mimetype=json
 
             return response
     

@@ -54,8 +54,8 @@ def summary(text_input, aim=50, deviation_input=10, num_summaries=1):
 
     print("text:", text)
     print("compression:", compression)
-    print("aim", aim_rel)
+    print("aim:", aim_rel)
     print("deviation:", deviation_output)
 
-    return  text
-    # return  text, compression, aim_rel, deviation_output
+    # return  text
+    return  text, compression, aim_rel, deviation_output
