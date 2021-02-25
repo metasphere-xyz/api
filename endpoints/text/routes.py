@@ -1,9 +1,9 @@
 from flask import *
 from flask import Blueprint
 from endpoints.text.functions import *
-from transformers import pipeline
-summarizer = pipeline("summarization", model="t5-small", tokenizer="t5-small", framework="tf")
-import json
+# from transformers import pipeline
+# summarizer = pipeline("summarization", model="t5-small", tokenizer="t5-small", framework="tf")
+# import json
 
 text = Blueprint('text', __name__)
 
@@ -11,27 +11,42 @@ text = Blueprint('text', __name__)
 def summarize():
     json = 'application/json'
     text = 'text/plain'
+    html = 'text/html'
     accept_json = request.accept_mimetypes['application/json']
-    accept_text = request.accept_mimetypes['application/json']
+    accept_text = request.accept_mimetypes['text/plain']
+    accept_html = request.accept_mimetypes['text/html']
 
+    # # HTML -> MTML
+    # if request.content_type == html and accept_html==1:
+        
+    #     response = Response(summary, mimetype=html)
 
+    # # TEXT/PLAIN -> TEXT/PLAIN
+    # if request.content_type == text and accept_text==1:
+        
+    #     response = Response(summary, mimetype=text)
+    
+    # # TEXT/PLAIN -> APPLICATION/JSON
+    # if request.content_type == text and accept_text==1:
+        
+    #     response = Response(summary, mimetype=json) 
+    
+    # # JSON -> TEXT/PLAIN
+    # if request.content_type == text and accept_text==1:
+        
+    #     response = Response(summary, mimetype=text) 
+
+    # JSON -> JSON
     if request.content_type == json and accept_json==1:
-        print('application/json')
         if request.is_json:
             text = request.json.get("text")
-            aim = request.json.get("aim")
-            summary_content = summarizer(str(text), min_length=5, max_length=10)
-            summary = str(summary_content)
 
-            # response = app.response_class(
-            #     response=json.dumps(summary),
-            #     status=200,
-            #     mimetype='application/json'
-            # ) 
-            # -> not working out of the box -> customizing of the flask response class necessary
+            summary_result = summary(text)
 
-            response = Response(summary, mimetype='application/json')
+            response = Response(summary_result, mimetype=json)
 
             return response
+    
+    
 
     return "test"
