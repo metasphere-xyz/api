@@ -49,18 +49,43 @@ def summarize():
             aim_rel = [0] * chunk_number
             deviation_output = [0] * chunk_number
 
+            data = {
+                        "chunk_sequence": [
+                            {
+                                "chunk_id": "md5sum",
+                                "summary": [
+                                    {
+                                        "text": "This is a short summary.",
+                                        "summary_id": "md5sum",
+                                        "compression": 32,
+                                        "aim": 35,
+                                        "deviation": 3
+                                    },
+                                ]
+                            },
+                        ]
+                    }
+
             for i in range(chunk_number):
                 text = req_json['chunk_sequence'][i]['text']
                 text_chunk[i], compression[i], aim_rel[i], deviation_output[i] = summary(text, aim=20, num_summaries=2)
 
+                data[0]['summary'].append({
+                    "text": text_chunk[i],
+                    "summary_id": "md5sum",
+                    "compression": compression[i],
+                    "aim": aim_rel[i],
+                    "deviation": deviation_output[i]
+                })
             # text, compression, aim_rel, deviation_output = summary(text, aim=20, num_summaries=2)
 
-            data = {
-                "text": text_chunk,
-                "compression": compression,
-                "aim_rel": aim_rel,
-                "deviation_output": deviation_output
-                }
+            # data = {
+            #     "text": text_chunk,
+            #     "compression": compression,
+            #     "aim_rel": aim_rel,
+            #     "deviation_output": deviation_output
+            #     }
+            
             response = make_response(data)
             response.mimetype=json
 
