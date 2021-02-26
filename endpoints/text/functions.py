@@ -1,7 +1,11 @@
+from flask import jsonify
+import json
 from transformers import pipeline
 summarizer = pipeline("summarization", model="t5-small", tokenizer="t5-small", framework="tf")
 
-def summary(text_input, aim=50, deviation_input=10, num_summaries=1):
+def summary(text_input, aim=50, deviation_input=10, num_summaries=1, chunk_number=1):
+
+    print("chunk_number:", chunk_number)
 
     if num_summaries > 1:
         min_length_rel = [0] * num_summaries
@@ -13,7 +17,7 @@ def summary(text_input, aim=50, deviation_input=10, num_summaries=1):
         compression = [0] * num_summaries
         deviation_output = [0] * num_summaries
         text_input_length = len(list(text_input.split()))
-
+            
 
         for i in range(num_summaries):
             min_length_rel[i] = (aim + i*deviation_input)/100
@@ -31,6 +35,10 @@ def summary(text_input, aim=50, deviation_input=10, num_summaries=1):
             text_length = len(list(text[i].split()))
             compression[i] = round(text_length / text_input_length,3)
             deviation_output[i] = round(abs(compression[i] - aim_rel[i]),3)
+            
+        # data_json = json.dumps(data)
+        # print(data_json)
+        
 
     if num_summaries == 1:
         aim_rel = aim/100
@@ -52,10 +60,9 @@ def summary(text_input, aim=50, deviation_input=10, num_summaries=1):
         compression = round(text_length / text_input_length, 2)
         deviation_output = round(abs(compression - aim_rel),2)
 
-    print("text:", text)
-    print("compression:", compression)
-    print("aim:", aim_rel)
-    print("deviation:", deviation_output)
+    # print("text:", text)
+    # print("compression:", compression)
+    # print("aim:", aim_rel)
+    # print("deviation:", deviation_output)
 
-    # return  text
     return  text, compression, aim_rel, deviation_output
