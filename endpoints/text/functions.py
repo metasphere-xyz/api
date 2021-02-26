@@ -17,7 +17,6 @@ def summary(text_input, aim=50, deviation_input=10, num_summaries=1, chunk_numbe
         compression = [0] * num_summaries
         deviation_output = [0] * num_summaries
         text_input_length = len(list(text_input.split()))
-            
 
         for i in range(num_summaries):
             min_length_rel[i] = (aim + i*deviation_input)/100
@@ -35,10 +34,6 @@ def summary(text_input, aim=50, deviation_input=10, num_summaries=1, chunk_numbe
             text_length = len(list(text[i].split()))
             compression[i] = round(text_length / text_input_length,3)
             deviation_output[i] = round(abs(compression[i] - aim_rel[i]),3)
-            
-        # data_json = json.dumps(data)
-        # print(data_json)
-        
 
     if num_summaries == 1:
         aim_rel = aim/100
@@ -59,10 +54,5 @@ def summary(text_input, aim=50, deviation_input=10, num_summaries=1, chunk_numbe
         text_length = len(list(text.split()))
         compression = round(text_length / text_input_length, 2)
         deviation_output = round(abs(compression - aim_rel),2)
-
-    # print("text:", text)
-    # print("compression:", compression)
-    # print("aim:", aim_rel)
-    # print("deviation:", deviation_output)
 
     return  text, compression, aim_rel, deviation_output
