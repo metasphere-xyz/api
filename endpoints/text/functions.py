@@ -5,8 +5,6 @@ summarizer = pipeline("summarization", model="t5-small", tokenizer="t5-small", f
 
 def summary(text_input, aim=50, deviation_input=10, num_summaries=1, chunk_number=1):
 
-    print("chunk_number:", chunk_number)
-
     if num_summaries > 1:
         min_length_rel = [0] * num_summaries
         max_length_rel = [0] * num_summaries
