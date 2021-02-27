@@ -8,9 +8,9 @@ text = Blueprint('text', __name__)
 @text.route('/summarize', methods=['POST', 'GET'])
 def summarize():
     # Input Parameter: Summary
-    aim = 50
-    deviation = 10
-    num_summaries = 1
+    # aim = 20
+    # deviation = 15
+    # num_summaries = 1
 
     app_json = 'application/json'
     text = 'text/plain'
@@ -23,56 +23,50 @@ def summarize():
     if request.content_type == app_json and accept_json==1:
 
         data = {
-                "chunk_sequence": [ 
+                "chunk_id": "md5sum",
+                "summary": [ 
                 ]
             }
             
         if request.is_json:
             req_json = request.get_json()
-            chunk_number = len(req_json["chunk_sequence"])
 
-            text_chunk = [""] * chunk_number
-            compression = [0] * chunk_number
-            aim_rel = [0] * chunk_number
-            deviation_output = [0] * chunk_number
-            
-            for i in range(chunk_number):
+            text = req_json["text"]
+            aim = req_json["aim"]
+            deviation = req_json["deviation"]
+            num_summaries = req_json["num_summaries"]
 
-                data["chunk_sequence"].append(
-                    {
-                        "chunk_id": i,
-                        "summary": [
-                        ]
-                    }
-                )
+            text_chunk = [""] * num_summaries
+            compression = [0] * num_summaries
+            aim_rel = [0] * num_summaries
+            deviation_output = [0] * num_summaries
 
-                text = req_json["chunk_sequence"][i]["text"]
-                text_chunk[i], compression[i], aim_rel[i], deviation_output[i] = summary(text, aim=aim, deviation_input=deviation, num_summaries=num_summaries, chunk_number=chunk_number)
-                
-                if num_summaries>1:
-                    for j in range(num_summaries):
-                        data["chunk_sequence"][i]["summary"].append(
-                            {
-                                "text": text_chunk[i][j],
-                                "summary_id": j,
-                                "compression": compression[i][j],
-                                "aim": aim_rel[i][j],
-                                "deviation": deviation_output[i][j]
-                            },
-                        )
-                else:
-                    data["chunk_sequence"][i]["summary"].append(
-                            {
-                                "text": text_chunk[i],
-                                "summary_id": i,
-                                "compression": compression[i],
-                                "aim": aim_rel[i],
-                                "deviation": deviation_output[i]
-                            },
-                        )
+            # Generate n>1 summaries by multiple summary call -> no num_summaries case distinction
+            text_chunk, compression, aim_rel, deviation_output = summary(text, aim=aim, deviation_input=deviation, num_summaries=num_summaries)
+
+            if num_summaries>1:
+                for i in range(num_summaries):
+                    data["summary"].append(
+                        {
+                            "text": text_chunk[i],
+                            "summary_id": i,
+                            "compression": compression[i],
+                            "aim": aim_rel[i],
+                            "deviation": deviation_output[i]
+                        },
+                    )
+            else: 
+                data["summary"].append(
+                        {
+                            "text": text_chunk,
+                            "summary_id": 1,
+                            "compression": compression,
+                            "aim": aim_rel,
+                            "deviation": deviation_output
+                        },
+                    )
 
             data_json = json.dumps(data)
-
             response = make_response(data_json)
             response.mimetype=app_json
 
