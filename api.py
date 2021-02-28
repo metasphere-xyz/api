@@ -10,8 +10,12 @@ from endpoints.text.routes import text
 
 def create_api():
     api = Flask(__name__)
-    @api.route('/', methods=['GET', 'POST'])
-    def welcome():
+    api.register_blueprint(text, url_prefix='/text')
+    return api
+
+# main route
+@api.route('/', methods=['GET', 'POST'])
+def welcome():
     try:
         return {
             'status': 'successful',
@@ -21,10 +25,6 @@ def create_api():
     except Exception as ex:
         traceback.print_exc()
         return {'status': 'failed', 'error': str(ex)}
-
-    api.register_blueprint(text, url_prefix='/text')
-
-    return api
 
 if __name__ == '__main__':
     api = create_api()
