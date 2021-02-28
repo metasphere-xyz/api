@@ -17,10 +17,10 @@ def summarize(text, aim, deviation, num_summaries, response_type):
 
     def define_min_max(aim, deviation):
         aim_rel = aim/100
-        min_length_rel = aim - deviation_input
-        max_length_rel = aim + deviation_input
-        min_length_abs = round(text_length * (min_length_rel/100))
-        max_length_abs = round(text_length * (max_length_rel/100))
+        min_length_rel = aim - deviation
+        max_length_rel = aim + deviation
+        min_length = round(text_length * (min_length_rel/100))
+        max_length = round(text_length * (max_length_rel/100))
         return (min_length, max_length)
 
     response = {
@@ -34,19 +34,19 @@ def summarize(text, aim, deviation, num_summaries, response_type):
         (min_length, max_length) = define_min_max(aim, deviation)
 
         summary = str(summarizer(text, min_length, max_length))
-        compression = round(summary / text_length, 2)
+        compression = round(len(list(summary.split())) / text_length, 2)
         deviation = round(abs(compression - aim),2)
 
         md5.update(summary.encode("utf-8"))
         summary_id = md5.hexdigest()
 
-        response["summary"][i] = {
+        response["summary"].append({
             "text": summary,
             "summary_id": summary_id,
             "compression": compression,
             "aim": aim,
             "deviation": deviation
-        }
+        })
 
     if response_type == "text/plain":
         return str(response["summary"][0])
