@@ -6,9 +6,9 @@ import json
 from functions import *
 from endpoints.graph.functions import *
 
-text = Blueprint('graph', __name__)
+graph = Blueprint('graph', __name__)
 
-@text.route('/find', methods=['POST', 'GET'])
+@graph.route('/find', methods=['POST', 'GET'])
 def return_nodes():
     # Parse input parameters from request
     if request_type(request) == 'application/json':

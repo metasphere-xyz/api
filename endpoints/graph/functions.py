@@ -5,7 +5,7 @@ graph = Graph(
 )
 
 # graph functions / cypher commands
-def find_node(node_id) {
+def find_node(node_id):
     query = '''
         MATCH (c:Chunks {chunk_id: {node_id}})
         RETURN c as Chunk
@@ -13,6 +13,5 @@ def find_node(node_id) {
 
     result = graph.run(query, parameters={'node_id': node_id}).data()
     return result
-}
 
 # TODO: add missing functions for other endpoints

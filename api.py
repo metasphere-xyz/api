@@ -23,8 +23,13 @@ def welcome():
         return {'status': 'failed', 'error': str(ex)}
 
 # Endpoints
+# /text/
 from endpoints.text.routes import text
 api.register_blueprint(text, url_prefix='/text')
+
+# /graph
+from endpoints.graph.routes import graph
+api.register_blueprint(graph, url_prefix='/graph')
 
 # TODO: add other endpoints
 
