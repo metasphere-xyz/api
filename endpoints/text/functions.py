@@ -3,7 +3,7 @@ from transformers import pipeline
 import hashlib
 md5 = hashlib.md5()
 
-def summarize(text, aim, compression, num_summaries, response_type):
+def summarize(text, aim, deviation, num_summaries, response_type):
     summarizer = pipeline(
                     "summarization",
                     model="t5-small",
