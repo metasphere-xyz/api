@@ -7,15 +7,15 @@ port = 2342
 
 from flask import *
 from endpoints.text.routes import text
+import traceback
 
 def create_api():
     api = Flask(__name__)
     api.register_blueprint(text, url_prefix='/text')
     return api
 
-# main route
-@api.route('/', methods=['GET', 'POST'])
-def welcome():
+    @api.route('/', methods=['GET', 'POST'])
+    def welcome():
     try:
         return {
             'status': 'successful',
