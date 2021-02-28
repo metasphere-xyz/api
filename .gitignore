@@ -1,6 +1,7 @@
 # Development tools
 .DS_Store
 .vscode
+.remote-sync.json
 
 # Environments
 .env
