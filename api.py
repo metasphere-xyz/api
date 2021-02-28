@@ -16,15 +16,15 @@ def create_api():
 
     @api.route('/', methods=['GET', 'POST'])
     def welcome():
-    try:
-        return {
-            'status': 'successful',
-            'message': 'Welcome to the metasphere api.',
-            'supported_endpoints': ['%s' % rule for rule in app.url_map.iter_rules()]
-        }
-    except Exception as ex:
-        traceback.print_exc()
-        return {'status': 'failed', 'error': str(ex)}
+        try:
+            return {
+                'status': 'successful',
+                'message': 'Welcome to the metasphere api.',
+                'supported_endpoints': ['%s' % rule for rule in app.url_map.iter_rules()]
+            }
+        except Exception as ex:
+            traceback.print_exc()
+            return {'status': 'failed', 'error': str(ex)}
 
 if __name__ == '__main__':
     api = create_api()
