@@ -1,5 +1,7 @@
 # from flask import jsonify
 from transformers import pipeline
+import hashlib
+md5 = hashlib.md5()
 
 def summarize(text, aim, compression, num_summaries, response_type):
     summarizer = pipeline(
@@ -9,8 +11,8 @@ def summarize(text, aim, compression, num_summaries, response_type):
                     framework="tf"
                 )
 
-    hash.update(text)
-    chunk_id = hash.hexdigest()
+    md5.update(text.encode("utf-8"))
+    chunk_id = md5.hexdigest()
     text_length = len(list(text.split()))
 
     def define_min_max(aim, deviation):
@@ -35,8 +37,8 @@ def summarize(text, aim, compression, num_summaries, response_type):
         compression = round(summary / text_length, 2)
         deviation = round(abs(compression - aim),2)
 
-        hash.update(summary)
-        summary_id = hash.hexdigest()
+        md5.update(summary.encode("utf-8"))
+        summary_id = md5.hexdigest()
 
         response["summary"][i] = {
             "text": summary,

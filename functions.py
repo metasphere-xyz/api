@@ -1,6 +1,4 @@
 # Helper functions
-import hashlib
-hash = hashlib.md5()
 import json
 
 # Helper functions for dealing with requests:
