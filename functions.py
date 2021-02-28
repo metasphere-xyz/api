@@ -34,7 +34,7 @@ def request_type(request):
     # filter for accepted request types:
     if request.content_type in accepted_request_types:
         # make sure JSON is valid
-        request.content_type == 'application/json':
+        if request.content_type == 'application/json':
             if !request.is_json:
                 return raise_error("malformed json", request)
         return request.content_type
