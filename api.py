@@ -14,4 +14,4 @@ def create_api():
     
 if __name__ == '__main__':
     api = create_api()
-    api.run(port=2323, debug=True)
+    api.run(host='0.0.0.0', port=2342, debug=True)
