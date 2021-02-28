@@ -1,0 +1,17 @@
+# pyenv -> https://github.com/pyenv/pyenv
+# pyenv-virtualenv -> https://github.com/pyenv/pyenv-virtualenv
+# python=3.8.6
+
+requests>=2.25.1
+neo4j>=4.2
+Flask>=1.1.2
+torch>=1.7.1
+torchvision>=0.8.2
+transformers>=4.2.1
+setuptools>=51.1.2
+wheel>=0.36.2
+spacy>=2.3.5
+livereload>=2.6.3
+fuzzy-match>=0.0.1
+tensorflow>=2.4.1
+py2neo
