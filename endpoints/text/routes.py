@@ -39,6 +39,9 @@ def return_summaries():
         response_type
     )
 
+# TODO: wrap request generation into function to get rid of repeating code
+# TODO: bugfixing
+
     if response_type == "text/plain":
         try:
             response = make_response(summary["summary"][0])
@@ -56,6 +59,11 @@ def return_summaries():
         except Exception as ex:
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
+
+# TODO: add missing endpoints:
+# /text/extract/chunks
+# /text/extract/entities
+# /text/find/similar -- working title
 
     #
     #

@@ -4,6 +4,7 @@ import hashlib
 md5 = hashlib.md5()
 
 def summarize(text, aim, deviation, num_summaries, response_type):
+    # TODO: make shell output less verbose/fix libcudart error
     summarizer = pipeline(
                     "summarization",
                     model="t5-small",
@@ -16,6 +17,7 @@ def summarize(text, aim, deviation, num_summaries, response_type):
     text_length = len(list(text.split()))
 
     def define_min_max(aim, deviation):
+        # TODO: adjust calculations
         aim_rel = aim/100
         min_length_rel = aim - deviation
         max_length_rel = aim + deviation
@@ -35,7 +37,7 @@ def summarize(text, aim, deviation, num_summaries, response_type):
 
         summary = str(summarizer(text, min_length, max_length))
         compression = round(len(list(summary.split())) / text_length, 2)
-        deviation = round(abs(compression - aim),2)
+        deviation = round(abs(compression - aim), 2)
 
         md5.update(summary.encode("utf-8"))
         summary_id = md5.hexdigest()

@@ -40,9 +40,9 @@ def request_type(request):
         return raise_error("unsupported request type", request)
 
 # Error handling
-# TODO/Backlog: reformat into JSON outputs
 def raise_error(error_type, request=""):
     def return_formatted(message):
+        # TODO/Backlog: reformat into JSON outputs
         return str(message)
 
     if error_type == "unsupported response type":
@@ -56,5 +56,11 @@ def raise_error(error_type, request=""):
 
     if error_type == "no text specified":
         message = "Error: No input text specified"
+
+    if error_type == "no id specified":
+        message = "Error: No id specified"
+
+    if error_type == "json expected":
+        message = "Error: Unexpected Request Content-Type (" + request.content_type + "). Expected Content-Type is application/json"
 
     return return_formatted(message)

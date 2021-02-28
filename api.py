@@ -13,9 +13,9 @@ def welcome():
     try:
         return {
             'status': 'success',
+            'message': 'Welcome to the metasphere api!',
             'request type': request_type(request),
             'response type': response_type(request),
-            'message': 'Welcome to the metasphere api!',
             'supported_endpoints': ['%s' % rule for rule in api.url_map.iter_rules()]
         }
     except Exception as ex:
@@ -25,6 +25,8 @@ def welcome():
 # Endpoints
 from endpoints.text.routes import text
 api.register_blueprint(text, url_prefix='/text')
+
+# TODO: add other endpoints
 
 # Run API
 if __name__ == '__main__':
