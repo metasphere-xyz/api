@@ -48,7 +48,4 @@ def summarize(text, aim, deviation, num_summaries, response_type):
             "deviation": deviation
         })
 
-    if response_type == "text/plain":
-        return str(response["summary"][0])
-    elif response_type == "application/json":
-        return response
+    return response

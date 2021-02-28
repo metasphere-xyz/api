@@ -1,5 +1,6 @@
 from flask import *
 from flask import Blueprint
+import json
 
 # Custom functions
 from functions import *
@@ -30,7 +31,7 @@ def return_summaries():
         num_summaries = "1"
 
     # calculate response via summarize function
-    response = summarize(
+    summary = summarize(
         text,
         aim,
         deviation,
@@ -38,11 +39,24 @@ def return_summaries():
         response_type
     )
 
-    try:
-        return response
-    except Exception as ex:
-        traceback.print_exc()
-        return {'status': 'failed', 'error': str(ex)}
+    if response_type == "text/plain":
+        try:
+            response = make_response(summary["summary"][0])
+            response.mimetype = 'text/plain'
+            return response
+        except Exception as ex:
+            traceback.print_exc()
+            return {'status': 'failed', 'error': str(ex)}
+
+    elif response_type == "application/json":
+        try:
+            response = make_response(json.dumps(summary))
+            response.mimetype = 'application/json'
+            return response
+        except Exception as ex:
+            traceback.print_exc()
+            return {'status': 'failed', 'error': str(ex)}
+
     #
     #
     # if request.content_type == app_json and accept_json==1:
