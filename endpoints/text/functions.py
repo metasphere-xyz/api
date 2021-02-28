@@ -1,4 +1,3 @@
-import json
 # from flask import jsonify
 from transformers import pipeline
 
