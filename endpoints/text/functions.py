@@ -40,7 +40,7 @@ def summarize(text, aim, compression, num_summaries, response_type):
 
         response["summary"][i] = {
             "text": summary,
-            "summary_id": summary_id
+            "summary_id": summary_id,
             "compression": compression,
             "aim": aim,
             "deviation": deviation
