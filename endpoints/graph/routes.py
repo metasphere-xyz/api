@@ -44,7 +44,8 @@ def return_nodes():
 # TODO: add missing endpoints:
 # /graph/find/chunk
 # /graph/find/entity
-# /graph/find/summary
+# /graph/find/summaries
+# /graph/find/collection
 #
 # /graph/add/chunk ({chunk_id, chunk_text, etc.} (json object))
 # /graph/add/summary (chunk_id, summary (json object))
