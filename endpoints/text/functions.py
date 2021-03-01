@@ -1,56 +1,56 @@
-from flask import jsonify
-import json
+# from flask import jsonify
 from transformers import pipeline
-summarizer = pipeline("summarization", model="t5-small", tokenizer="t5-small", framework="tf")
+import hashlib
+md5 = hashlib.md5()
+from fuzzy_match import algorithims as algorithms
 
-def summary(text_input, aim=50, deviation_input=10, num_summaries=1):
+def summarize(text, aim, deviation, num_summaries, response_type):
+    # TODO: make shell output less verbose/fix libcudart error
+    summarizer = pipeline(
+                    "summarization",
+                    model="t5-small",
+                    tokenizer="t5-small",
+                    framework="tf"
+                )
 
-    if num_summaries > 1:
-        min_length_rel = [0] * num_summaries
-        max_length_rel = [0] * num_summaries
-        min_length_words = [0] * num_summaries
-        max_length_words = [0] * num_summaries
-        text = [""] * num_summaries
-        aim_rel = [0] * num_summaries
-        compression = [0] * num_summaries
-        deviation_output = [0] * num_summaries
-        text_input_length = len(list(text_input.split()))
+    md5.update(text.encode("utf-8"))
+    chunk_id = md5.hexdigest()
+    text_length = len(list(text.split()))
 
-        for i in range(num_summaries):
-            min_length_rel[i] = (aim + i*deviation_input)/100
-            max_length_rel[i] = (aim + (i+1)*deviation_input)/100
-            min_length_words[i] = round(text_input_length * (aim + i*deviation_input)/100)
-            max_length_words[i] = round(text_input_length * (aim + (i+1)*deviation_input)/100)
-            aim_rel[i] = min_length_rel[i] + (deviation_input/2)/100
-
-            summary_output = summarizer(
-                text_input, 
-                min_length=min_length_words[i], 
-                max_length=max_length_words[i]
-            )
-            text[i] = str(summary_output)
-            text_length = len(list(text[i].split()))
-            compression[i] = round(text_length / text_input_length,3)
-            deviation_output[i] = round(abs(compression[i] - aim_rel[i]),3)
-
-    if num_summaries == 1:
+    def define_min_max(aim, deviation):
+        # TODO: adjust calculations
         aim_rel = aim/100
-        text_input_length = len(list(text_input.split()))
+        min_length_rel = aim - deviation
+        max_length_rel = aim + deviation
+        min_length = round(text_length * (min_length_rel/100))
+        max_length = round(text_length * (max_length_rel/100))
+        return (min_length, max_length)
 
-        min_length_rel = aim - deviation_input
-        max_length_rel = aim + deviation_input
+    response = {
+        "chunk_id": chunk_id,
+        "summary": [
+        ]
+    }
 
-        min_length_abs = round(text_input_length * (min_length_rel/100))
-        max_length_abs = round(text_input_length * (max_length_rel/100))
-        
-        summary_output = summarizer(
-            text_input, 
-            min_length=min_length_abs, 
-            max_length=max_length_abs
-        )
-        text = str(summary_output)
-        text_length = len(list(text.split()))
-        compression = round(text_length / text_input_length, 2)
-        deviation_output = round(abs(compression - aim_rel),2)
+    for i in range(num_summaries):
+        final_aim = aim + deviation * i
+        (min_length, max_length) = define_min_max(final_aim, deviation)
 
-    return  text, compression, aim_rel, deviation_output
+        summary = str(summarizer(text, max_length=max_length, min_length=min_length))[19:-3]
+        # compression = round((len(list(summary.split())) / text_length)*100, 2)
+        compression = round(algorithms.trigram(summary, text)*100,2)
+        final_deviation = round(abs(compression - final_aim), 2)
+
+        md5.update(summary.encode("utf-8"))
+        summary_id = md5.hexdigest()
+
+        response["summary"].append({
+            "text": summary,
+
+            "summary_id": summary_id,
+            "compression": compression,
+            "aim": final_aim,
+            "deviation": final_deviation
+        })
+
+    return response

@@ -10,7 +10,5 @@ spacy>=2.3.5
 livereload>=2.6.3
 fuzzy-match>=0.0.1
 tensorflow>=2.4.1
-
-# pyenv -> https://github.com/pyenv/pyenv
-# pyenv-virtualenv -> https://github.com/pyenv/pyenv-virtualenv
-# python=3.8.6
+py2neo
+fuzzy-match>=0.0.1
