@@ -1,8 +1,8 @@
 from py2neo import Graph
-# graph = Graph(
-#     "bolt://127.0.0.1:7687",
-#     auth=('neo4j', 'burr-query-duel-cherry')
-# )
+graph = Graph(
+    "bolt://127.0.0.1:7687",
+    auth=('neo4j', 'burr-query-duel-cherry')
+)
 
 # graph functions / cypher commands
 def find_node(node_id):
