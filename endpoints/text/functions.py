@@ -3,6 +3,8 @@ from transformers import pipeline
 import hashlib
 md5 = hashlib.md5()
 
+from fuzzy_match import algorithims
+
 def summarize(text, aim, deviation, num_summaries, response_type):
     # TODO: make shell output less verbose/fix libcudart error
     summarizer = pipeline(
@@ -23,6 +25,7 @@ def summarize(text, aim, deviation, num_summaries, response_type):
         max_length_rel = aim + deviation
         min_length = round(text_length * (min_length_rel/100))
         max_length = round(text_length * (max_length_rel/100))
+        print("deviation from define_min_max: ", deviation)
         return (min_length, max_length)
 
     response = {
@@ -32,22 +35,24 @@ def summarize(text, aim, deviation, num_summaries, response_type):
     }
 
     for i in range(num_summaries):
-        aim = aim + deviation * i
-        (min_length, max_length) = define_min_max(aim, deviation)
+        final_aim = aim + deviation * i
+        (min_length, max_length) = define_min_max(final_aim, deviation)
 
-        summary = str(summarizer(text, min_length, max_length))
-        compression = round(len(list(summary.split())) / text_length, 2)
-        deviation = round(abs(compression - aim), 2)
+        summary = str(summarizer(text, max_length=max_length, min_length=min_length))[19:-3]
+        # compression = round((len(list(summary.split())) / text_length)*100, 2)
+        compression = round(algorithims.trigram(summary, text),2)*100
+        final_deviation = round(abs(compression - final_aim), 2)
 
         md5.update(summary.encode("utf-8"))
         summary_id = md5.hexdigest()
 
         response["summary"].append({
             "text": summary,
+
             "summary_id": summary_id,
             "compression": compression,
-            "aim": aim,
-            "deviation": deviation
+            "aim": final_aim,
+            "deviation": final_deviation
         })
 
     return response
