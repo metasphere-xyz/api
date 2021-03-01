@@ -23,7 +23,7 @@ def return_nodes():
     # calculate response via summarize function
     nodes = find_node(chunk_id)
 
-    if response_type == "text/plain":
+    if response_type(request) == "text/plain":
         try:
             response = make_response(summary["summary"][0])
             response.mimetype = 'text/plain'
@@ -32,7 +32,7 @@ def return_nodes():
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
 
-    elif response_type == "application/json":
+    elif response_type(request) == "application/json":
         try:
             response = make_response(json.dumps(summary))
             response.mimetype = 'application/json'
