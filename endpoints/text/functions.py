@@ -117,7 +117,9 @@ def summarize(text, aim, deviation, num_summaries, response_type):
 
         # summary = str(summarizer_pipeline(text, min_length, max_length))
         # summary = str(summarizer_torch(text, min_length, max_length))
-        summary = summarizer_bert(text, ratio=final_aim/100)
+        # summary = summarizer_bert(text, ratio=final_aim/100)
+        summary = summarizer_bert(text, min_length=min_length, max_length=max_length, num_sentences=1)
+        print("summary: "+summary)
 
         compression = round(algorithms.trigram(summary, text)*100,2)
         final_deviation = round(abs(compression - final_aim), 2)
