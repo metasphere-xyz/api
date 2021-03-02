@@ -36,8 +36,31 @@ def summarize(text, aim, deviation, num_summaries, response_type):
         final_aim = aim + deviation * i
         (min_length, max_length) = define_min_max(final_aim, deviation)
 
-        summary = str(summarizer(text, max_length=max_length, min_length=min_length))[19:-3]
-        # compression = round((len(list(summary.split())) / text_length)*100, 2)
+        summary = str(summarizer(
+            text,
+            max_length=max_length,
+            min_length=min_length,
+            # input_ids[torch.LongTensor],
+            do_sample=False,
+            early_stopping=True,
+            num_beams=3,
+            temperature=1.0,
+            top_k=50,
+            top_p=1.0,
+            repetition_penalty=1.0,
+            # pad_token_id[int],
+            # bos_token_id[int],
+            # eos_token_id[int],
+            length_penalty=1.0,
+            no_repeat_ngram_size=0,
+            # bad_words_ids=List[List[int]],
+            num_return_sequences=1,
+            # attention_mask=(batch_size, sequence_length),
+            # decoder_start_token_id[int],
+            use_cache=True,
+            # prefix_allowed_tokens_fn(Callable[[int, torch.Tensor], List[int]]),
+            # model_kwargs
+            ))[19:-3]
         compression = round(algorithms.trigram(summary, text)*100,2)
         final_deviation = round(abs(compression - final_aim), 2)
 

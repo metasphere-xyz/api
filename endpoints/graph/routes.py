@@ -34,7 +34,7 @@ def return_nodes():
 
     elif response_type(request) == "application/json":
         try:
-            response = make_response(json.dumps(summary))
+            response = make_response(json.dumps(nodes))
             response.mimetype = 'application/json'
             return response
         except Exception as ex:
