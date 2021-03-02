@@ -1,6 +1,6 @@
 # from flask import jsonify
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
+import math
 import torch
 from transformers import pipeline
 # from transformers import T5Tokenizer, T5ForConditionalGeneration, T5Config
@@ -9,6 +9,8 @@ import hashlib
 md5 = hashlib.md5()
 from fuzzy_match import algorithims as algorithms
 from summarizer import Summarizer
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 
 # summarization_model = "facebook/bart-base"
 # summarization_model = "facebook/bart-large-cnn"
@@ -119,11 +121,12 @@ def summarize(text, aim, deviation, num_summaries, response_type):
         # summary = str(summarizer_pipeline(text, min_length, max_length))
         # summary = str(summarizer_torch(text, min_length, max_length))
         # summary = summarizer_bert(text, ratio=final_aim/100)
-        summary = summarizer_bert(text, min_length=min_length, max_length=max_length, num_sentences=1)
+        # summary = summarizer_bert(text, min_length=min_length, max_length=max_length, num_sentences=1)
+        summary = text
         print ("text: "+text)
         print("summary: "+summary)
 
-        compression = round(algorithms.trigram(summary, text)*100,2)
+        compression = math.floor(100/(1+round(algorithms.trigram(summary, text)*100,2)))
         final_deviation = round(abs(compression - final_aim), 2)
 
         hash = hashlib.md5(summary.encode("utf-8"))
