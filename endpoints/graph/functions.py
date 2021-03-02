@@ -1,7 +1,6 @@
 from py2neo import Graph
 graph = Graph(
-    # "bolt://127.0.0.1:7687",
-    "bolt://ecchr.metasphere.xyz:7687/"
+    "bolt://127.0.0.1:7687",
     auth=('neo4j', 'burr-query-duel-cherry')
 )
 
@@ -16,5 +15,4 @@ def find_node(node_id):
     return result
 
 # TODO: add missing functions for other endpoints
-
-def add_chunk():
+    
