@@ -92,8 +92,9 @@ def summarizer_torch(text, min_length, max_length):
 
 def summarize(text, aim, deviation, num_summaries, response_type):
 
-    md5.update(text.encode("utf-8"))
-    chunk_id = md5.hexdigest()
+    # md5.update(text.encode("utf-8"))
+    hash = hashlib.md5(text.encode("utf-8"))
+    chunk_id = hash.hexdigest()
     text_length = len(list(text.split()))
 
     def define_min_max(text_length, aim, deviation):
@@ -119,13 +120,14 @@ def summarize(text, aim, deviation, num_summaries, response_type):
         # summary = str(summarizer_torch(text, min_length, max_length))
         # summary = summarizer_bert(text, ratio=final_aim/100)
         summary = summarizer_bert(text, min_length=min_length, max_length=max_length, num_sentences=1)
+        print ("text: "+text)
         print("summary: "+summary)
 
         compression = round(algorithms.trigram(summary, text)*100,2)
         final_deviation = round(abs(compression - final_aim), 2)
 
-        md5.update(summary.encode("utf-8"))
-        summary_id = md5.hexdigest()
+        hash = hashlib.md5(summary.encode("utf-8"))
+        summary_id = hash.hexdigest()
 
         response["summary"].append({
             "text": summary,
