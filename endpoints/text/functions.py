@@ -1,44 +1,100 @@
 # from flask import jsonify
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
+import torch
 from transformers import pipeline
+from transformers import T5Tokenizer, T5ForConditionalGeneration, T5Config
 import hashlib
 md5 = hashlib.md5()
 from fuzzy_match import algorithims as algorithms
 
-def summarize(text, aim, deviation, num_summaries, response_type):
-    # TODO: make shell output less verbose/fix libcudart error
+def preprocess(text):
+    return text.replace("\r", "\n ").replace("\n", " ").replace("\s\s+", " ").strip()
+
+def summarizer_pipeline(text, min_length, max_length):
     summarizer = pipeline(
-                    "summarization",
-                    model="t5-small",
-                    tokenizer="t5-small",
-                    framework="tf",
-                    # input_ids[torch.LongTensor],
-                    do_sample=False,
-                    early_stopping=True,
-                    num_beams=3,
-                    temperature=1.0,
-                    top_k=50,
-                    top_p=1.0,
-                    repetition_penalty=1.0,
-                    # pad_token_id[int],
-                    # bos_token_id[int],
-                    # eos_token_id[int],
-                    length_penalty=1.0,
-                    no_repeat_ngram_size=0,
-                    # bad_words_ids=List[List[int]],
-                    num_return_sequences=1,
-                    # attention_mask=(batch_size, sequence_length),
-                    # decoder_start_token_id[int],
-                    use_cache=True,
-                    # prefix_allowed_tokens_fn(Callable[[int, torch.Tensor], List[int]]),
-                    # model_kwargs
-                )
+        "summarization",
+        # model="t5-small",
+        # tokenizer="t5-small",
+        model="t5-base",
+        tokenizer="t5-base",
+        framework="tf"
+    )
+    summary = str(summarizer(
+        text,
+        max_length=max_length,
+        min_length=min_length,
+        # input_ids[torch.LongTensor],
+        do_sample=False,
+        early_stopping=True,
+        # early_stopping=False,
+        num_beams=5,
+        temperature=1.0,
+        top_k=50,
+        top_p=1.0,
+        repetition_penalty=1.0,
+        # pad_token_id[int],
+        # bos_token_id[int],
+        # eos_token_id[int],
+        length_penalty=2.0,
+        no_repeat_ngram_size=0,
+        # bad_words_ids=List[List[int]],
+        num_return_sequences=1,
+        # attention_mask=(batch_size, sequence_length),
+        # decoder_start_token_id[int],
+        use_cache=True,
+        # prefix_allowed_tokens_fn(Callable[[int, torch.Tensor], List[int]]),
+        # model_kwargs
+    )[0]["summary_text"])
+    return summary
+
+def summarizer_torch(text, min_length, max_length):
+    model = T5ForConditionalGeneration.from_pretrained('t5-base')
+    tokenizer = T5Tokenizer.from_pretrained('t5-base')
+    device = torch.device('cpu')
+
+    preprocessed_text = preprocess(text)
+    # preprocessed_text = text
+    tokenized_text = tokenizer.encode(preprocessed_text, return_tensors="pt").to(device)
+
+    summaries = model.generate(
+        tokenized_text,
+        max_length=max_length,
+        min_length=min_length,
+        # input_ids[torch.LongTensor],
+        do_sample=False,
+        early_stopping=True,
+        # early_stopping=False,
+        num_beams=5,
+        temperature=1.0,
+        top_k=50,
+        top_p=1.0,
+        repetition_penalty=1.0,
+        # pad_token_id[int],
+        # bos_token_id[int],
+        # eos_token_id[int],
+        length_penalty=2.0,
+        no_repeat_ngram_size=0,
+        # bad_words_ids=List[List[int]],
+        num_return_sequences=1,
+        # attention_mask=(batch_size, sequence_length),
+        # decoder_start_token_id[int],
+        use_cache=True,
+        # prefix_allowed_tokens_fn(Callable[[int, torch.Tensor], List[int]]),
+        # model_kwargs
+    )
+
+    summary = tokenizer.decode(summaries[0], skip_special_tokens=True)
+    return summary
+
+def summarize(text, aim, deviation, num_summaries, response_type):
 
     md5.update(text.encode("utf-8"))
     chunk_id = md5.hexdigest()
     text_length = len(list(text.split()))
 
-    def define_min_max(aim, deviation):
-        # TODO: adjust calculations
+    def define_min_max(text_length, aim, deviation):
+        # TODO: bei zu kleinem aim kommen negative Zahlen raus
         aim_rel = aim/100
         min_length_rel = aim - deviation
         max_length_rel = aim + deviation
@@ -54,13 +110,11 @@ def summarize(text, aim, deviation, num_summaries, response_type):
 
     for i in range(num_summaries):
         final_aim = aim + deviation * i
-        (min_length, max_length) = define_min_max(final_aim, deviation)
+        (min_length, max_length) = define_min_max(text_length, final_aim, deviation)
 
-        summary = str(summarizer(
-            text,
-            max_length=max_length,
-            min_length=min_length
-        ))[19:-3]
+        summary = str(summarizer_pipeline(text, min_length, max_length))
+        # summary = str(summarizer_torch(text, min_length, max_length))
+
         compression = round(algorithms.trigram(summary, text)*100,2)
         final_deviation = round(abs(compression - final_aim), 2)
 
@@ -69,7 +123,6 @@ def summarize(text, aim, deviation, num_summaries, response_type):
 
         response["summary"].append({
             "text": summary,
-
             "summary_id": summary_id,
             "compression": compression,
             "aim": final_aim,
