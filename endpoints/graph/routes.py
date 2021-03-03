@@ -8,13 +8,13 @@ from endpoints.graph.functions import *
 
 graph = Blueprint('graph', __name__)
 
-@graph.route('/find', methods=['POST', 'GET'])
-def return_nodes():
+@graph.route('/find/chunk', methods=['POST', 'GET'])
+def return_chunk():
     # Parse input parameters from request
     if request_type(request) == 'application/json':
         # parse request values from JSON
         chunk_id = request.get_json()["chunk_id"]
-        # name = request.get_json()["name"]
+        # chunk_name = request.get_json()[]
     else:
         raise_error("json expected")
 
@@ -41,6 +41,15 @@ def return_nodes():
         except Exception as ex:
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
+
+@graph.route('/find/chunk/<string:node_id>', methods=['GET', 'POST'])
+def return_chunk_viaGET(node_id):
+    nodes = find_node(node_id)
+
+    response = make_response(json.dumps(nodes))
+    response.mimetype = 'application/json'
+    return response
+    
 
 # TODO: add missing endpoints:
 # /graph/find/chunk
