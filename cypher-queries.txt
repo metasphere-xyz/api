@@ -1,6 +1,7 @@
 !! Example Database Script !!
 -> each paragraph represents one cypher query block
 
+--> ADD Chunks and Collections
 CREATE(c:Collection {name:"Wolfgang-Mark", md5sum: "4ece0d064575609367f665d617d95d30", duration: 0, src: "", type:""})
 CREATE(c1:Chunk {name:"1-Wolfgang.mp3", md5sum: "87bd38fd5dc6ea68519703b8b1c18108"})
 CREATE(c2:Chunk {name:"2-Wolfgang.mp3", md5sum: "701978a0e81db41e6835ddc49e9fd62d"})
@@ -8,6 +9,7 @@ CREATE(c3:Chunk {name:"3-Wolfgang.mp3", md5sum: "614abc0d5155c15ecf37c0d4db3f82b
 CREATE(c4:Chunk {name:"4-Wolfgang.mp3", md5sum: "71a746605697ef144f9322ef37814f13"})
 CREATE(c5:Chunk {name:"5-Mark.mp3", md5sum: "cc980bcc6ad2fa883e219a86f0d3cef5"})
 
+--> CONNECT Chunks and Collection
 MATCH (ch1:Chunk {md5sum:"87bd38fd5dc6ea68519703b8b1c18108"}),(ch2:Chunk {md5sum:"701978a0e81db41e6835ddc49e9fd62d"}),(ch3:Chunk {md5sum:"614abc0d5155c15ecf37c0d4db3f82b5"}),(ch4:Chunk {md5sum:"71a746605697ef144f9322ef37814f13"}),(ch5:Chunk {md5sum:"cc980bcc6ad2fa883e219a86f0d3cef5"}),(co:Collection {md5sum:"4ece0d064575609367f665d617d95d30"})
 CREATE (ch1)-[:CONTAINED_IN]->(co), (ch2)-[:CONTAINED_IN]->(co), (ch3)-[:CONTAINED_IN]->(co), (ch4)-[:CONTAINED_IN]->(co), (ch5)-[:CONTAINED_IN]->(co)
 
@@ -77,7 +79,7 @@ MATCH(w:Word {name:"multilayered."}), (c:Chunk {md5sum:"cc980bcc6ad2fa883e219a86
 CREATE (w)-[:CONTAINED_IN]->(c)
 
 
-ADD Summmaries 1 & 2 for 2-Wolfgang chunk
+-> ADD Summmaries 1 & 2 for 2-Wolfgang chunk
 CREATE(s:Summary {name:"Summary 1: 2-Wolfgang", summary_id: "211fc49dfc61001714bb0f6d34d55f97", compression: 44.39, aim: 35, deviation: 9.39})
 CREATE(s:Summary {name:"Summary 2: 2-Wolfgang", summary_id: "21fd51da567b8168a4fa3f12749fcc12", compression: 52.26, aim: 55, deviation: 2.74})
 
@@ -105,7 +107,7 @@ CREATE (w1)-[:CONTAINED_IN]->(s2)
 MATCH(w:Word {name:"London."}), (s2:Summary {summary_id:"21fd51da567b8168a4fa3f12749fcc12"})
 CREATE (w)-[:CONTAINED_IN]->(s2)
 
-CONNECT Summaries with Chunk
+-> CONNECT Summaries with Chunk
 MATCH(s1:Summary {summary_id:"211fc49dfc61001714bb0f6d34d55f97"}), (s2:Summary {summary_id:"21fd51da567b8168a4fa3f12749fcc12"}), (c:Chunk {name:"2-Wolfgang.mp3"})
 CREATE (s1)-[:BELONGS_TO]->(c), (s2)-[:BELONGS_TO]->(c)
 
@@ -121,13 +123,13 @@ CONNECTIONS Chunk-Sequence
 MATCH (c1:Chunk {name:"1-Wolfgang.mp3"}), (c2:Chunk {name:"2-Wolfgang.mp3"}), (c3:Chunk {name:"3-Wolfgang.mp3"}), (c4:Chunk {name:"4-Wolfgang.mp3"}), (c5:Chunk {name:"5-Mark.mp3"})
 CREATE (c1)-[:NEXT_CHUNK]->(c2), (c2)-[:NEXT_CHUNK]->(c3), (c3)-[:NEXT_CHUNK]->(c4), (c4)-[:NEXT_CHUNK]->(c5)
 
-SIMILARITY Connections
+-> SIMILARITY Connections
 a) [:SIMILARITY {similarity: 0.456}]
 b) [:similarity*0.456] - has to be modified not working yet
 MATCH (c3:Chunk {name:"3-Wolfgang.mp3"}), (c4:Chunk {name:"4-Wolfgang.mp3"})
 CREATE (c4)-[:SIMILARITY {similarity: 0.456}]->(c3)
 
-RENAMING node properties
+-> RENAMING node properties
 MATCH (c:Chunk)
 WITH collect(c) AS chunk
 CALL apoc.refactor.rename.nodeProperty("md5sum", "chunk_id", chunk)
@@ -140,7 +142,7 @@ CALL apoc.refactor.rename.nodeProperty("md5sum", "collection_id", collection)
 YIELD committedOperations
 RETURN committedOperations
 
-FUZZY Searches / Fuzzy Query Results
+-> FUZZY Searches / Fuzzy Query Results
 MATCH (w:Word)
 WHERE w.name STARTS WITH 'ECCHR'
 RETURN w.name, ID(w)
@@ -154,21 +156,21 @@ RETURN w.name, ID(w)
 
 --> Cypher Blocks <--
 
-Add Collection
+-> Add Collection
 CREATE(c:Collection {name:"Wolfgang-Mark", md5sum: "4ece0d064575609367f665d617d95d30", duration: 0, src: "", type:""})
 
-Add Chunk
+-> Add Chunk
 CREATE(c1:Chunk {name:"1-Wolfgang.mp3", md5sum: "87bd38fd5dc6ea68519703b8b1c18108"})
 CREATE(c2:Chunk {name:"2-Wolfgang.mp3", md5sum: "701978a0e81db41e6835ddc49e9fd62d"})
 CREATE(c3:Chunk {name:"3-Wolfgang.mp3", md5sum: "614abc0d5155c15ecf37c0d4db3f82b5"})
 CREATE(c4:Chunk {name:"4-Wolfgang.mp3", md5sum: "71a746605697ef144f9322ef37814f13"})
 CREATE(c5:Chunk {name:"5-Mark.mp3", md5sum: "cc980bcc6ad2fa883e219a86f0d3cef5"})
 
-Connect Chunk and Collection
+-> Connect Chunk and Collection
 MATCH (ch1:Chunk {md5sum:"87bd38fd5dc6ea68519703b8b1c18108"}),(ch2:Chunk {md5sum:"701978a0e81db41e6835ddc49e9fd62d"}),(ch3:Chunk {md5sum:"614abc0d5155c15ecf37c0d4db3f82b5"}),(ch4:Chunk {md5sum:"71a746605697ef144f9322ef37814f13"}),(ch5:Chunk {md5sum:"cc980bcc6ad2fa883e219a86f0d3cef5"}),(co:Collection {md5sum:"4ece0d064575609367f665d617d95d30"})
 CREATE (ch1)-[:CONTAINED_IN]->(co), (ch2)-[:CONTAINED_IN]->(co), (ch3)-[:CONTAINED_IN]->(co), (ch4)-[:CONTAINED_IN]->(co), (ch5)-[:CONTAINED_IN]->(co)
 
-Unwrap Chunk Content
+-> Unwrap Chunk Content
 WITH split("That's a very, interesting question, because it's kind of like all, all histories, it's multilayered.", " ") as text
 UNWIND range(0, size(text)-2) AS i
 MATCH(c:Chunk)
@@ -178,11 +180,11 @@ MERGE (w2:Word {name: text[i+1]})
 MERGE (w1)-[:NEXT_WORD]->(w2)
 CREATE (w1)-[:CONTAINED_IN]->(c)
 
-Connect last word -> has to be improved
+-> Connect last word -> has to be improved
 MATCH(w:Word {name:"multilayered."}), (c:Chunk {md5sum:"cc980bcc6ad2fa883e219a86f0d3cef5"})
 CREATE (w)-[:CONTAINED_IN]->(c)
 
-Delete Everything
+-> DELETE EVERYTHING
 match(n)
 detach delete(n)
 
