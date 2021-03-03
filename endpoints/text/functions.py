@@ -13,8 +13,9 @@ from transformers import AutoModel, AutoModelForSeq2SeqLM, AutoTokenizer
 from fuzzy_match import algorithims as algorithms
 
 # https://pypi.org/project/bert-extractive-summarizer/
-# from summarizer import Summarizer
-# summarizer_bert = Summarizer()
+# useful for summarizing multiple sentences to less sentences
+from summarizer import Summarizer
+summarizer_bert = Summarizer()
 
 # summarization_model = "facebook/bart-base"
 # summarization_model = "facebook/bart-large-cnn"
@@ -122,8 +123,9 @@ def summarize(text, aim, deviation, num_summaries, response_type):
 
         # summary = str(summarizer_pipeline(text, min_length, max_length))
         summary = str(summarizer_torch(text, min_length, max_length))
-        # summary = summarizer_bert(text, ratio=final_aim/100)
-        # summary = summarizer_bert(text, min_length=min_length, max_length=max_length, num_sentences=1)
+        # summary = summarizer_bert(text, num_sentences=0) // returns 1 sentence
+        # summary = summarizer_bert(text, min_length=5, max_length=15, num_sentences=0)
+        # summary = summarizer_bert(text, min_length=min_length, max_length=max_length, num_sentences=0)
         # summary = text
         print ("text: "+text)
         print("summary: "+summary)
