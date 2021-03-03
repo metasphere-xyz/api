@@ -14,6 +14,7 @@ def return_nodes():
     if request_type(request) == 'application/json':
         # parse request values from JSON
         chunk_id = request.get_json()["chunk_id"]
+        # name = request.get_json()["name"]
     else:
         raise_error("json expected")
 

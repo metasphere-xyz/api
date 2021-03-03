@@ -8,8 +8,8 @@ def summarize(text, aim, deviation, num_summaries, response_type):
     # TODO: make shell output less verbose/fix libcudart error
     summarizer = pipeline(
                     "summarization",
-                    model="t5-small",
-                    tokenizer="t5-small",
+                    model="t5-base",
+                    tokenizer="t5-base",
                     framework="tf"
                 )
 
@@ -41,23 +41,23 @@ def summarize(text, aim, deviation, num_summaries, response_type):
             max_length=max_length,
             min_length=min_length,
             # input_ids[torch.LongTensor],
-            do_sample=False,
-            early_stopping=True,
-            num_beams=3,
-            temperature=1.0,
-            top_k=50,
-            top_p=1.0,
-            repetition_penalty=1.0,
+            # do_sample=False,
+            # early_stopping=True,
+            # num_beams=3,
+            # temperature=1.0,
+            # top_k=50,
+            # top_p=1.0,
+            # repetition_penalty=1.0,
             # pad_token_id[int],
             # bos_token_id[int],
             # eos_token_id[int],
-            length_penalty=1.0,
-            no_repeat_ngram_size=0,
+            # length_penalty=1.0,
+            # no_repeat_ngram_size=0,
             # bad_words_ids=List[List[int]],
-            num_return_sequences=1,
+            # num_return_sequences=1,
             # attention_mask=(batch_size, sequence_length),
             # decoder_start_token_id[int],
-            use_cache=True,
+            # use_cache=True,
             # prefix_allowed_tokens_fn(Callable[[int, torch.Tensor], List[int]]),
             # model_kwargs
             ))[19:-3]
