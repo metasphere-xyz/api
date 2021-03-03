@@ -1,0 +1,189 @@
+!! Example Database Script !!
+-> each paragraph represents one cypher query block
+
+CREATE(c:Collection {name:"Wolfgang-Mark", md5sum: "4ece0d064575609367f665d617d95d30", duration: 0, src: "", type:""})
+CREATE(c1:Chunk {name:"1-Wolfgang.mp3", md5sum: "87bd38fd5dc6ea68519703b8b1c18108"})
+CREATE(c2:Chunk {name:"2-Wolfgang.mp3", md5sum: "701978a0e81db41e6835ddc49e9fd62d"})
+CREATE(c3:Chunk {name:"3-Wolfgang.mp3", md5sum: "614abc0d5155c15ecf37c0d4db3f82b5"})
+CREATE(c4:Chunk {name:"4-Wolfgang.mp3", md5sum: "71a746605697ef144f9322ef37814f13"})
+CREATE(c5:Chunk {name:"5-Mark.mp3", md5sum: "cc980bcc6ad2fa883e219a86f0d3cef5"})
+
+MATCH (ch1:Chunk {md5sum:"87bd38fd5dc6ea68519703b8b1c18108"}),(ch2:Chunk {md5sum:"701978a0e81db41e6835ddc49e9fd62d"}),(ch3:Chunk {md5sum:"614abc0d5155c15ecf37c0d4db3f82b5"}),(ch4:Chunk {md5sum:"71a746605697ef144f9322ef37814f13"}),(ch5:Chunk {md5sum:"cc980bcc6ad2fa883e219a86f0d3cef5"}),(co:Collection {md5sum:"4ece0d064575609367f665d617d95d30"})
+CREATE (ch1)-[:CONTAINED_IN]->(co), (ch2)-[:CONTAINED_IN]->(co), (ch3)-[:CONTAINED_IN]->(co), (ch4)-[:CONTAINED_IN]->(co), (ch5)-[:CONTAINED_IN]->(co)
+
+-> Chunk 1
+WITH split("So, hello everybody, to the latest edition of our podcast by ECCHR, European Center for Constitutional and Human Rights in Berlin.", " ") as text
+UNWIND range(0, size(text)-2) AS i
+MATCH(c:Chunk)
+WHERE c.md5sum="87bd38fd5dc6ea68519703b8b1c18108"
+MERGE (w1:Word {name: text[i]})
+MERGE (w2:Word {name: text[i+1]})
+MERGE (w1)-[:NEXT_WORD]->(w2)
+CREATE (w1)-[:CONTAINED_IN]->(c)
+
+MATCH(w:Word {name:"Berlin."}), (c:Chunk {md5sum:"87bd38fd5dc6ea68519703b8b1c18108"})
+CREATE (w)-[:CONTAINED_IN]->(c)
+
+-> Chunk 2
+WITH split("We're having a series of talks on Arts and Human Rights with some of the most well-known curators, artists, people from the arts world. And today my guest is Mark Sealy, curator, writer and director of The Association of Black Photographers in London, Photography expert and scholar.", " ") as text
+UNWIND range(0, size(text)-2) AS i
+MATCH(c:Chunk)
+WHERE c.md5sum="701978a0e81db41e6835ddc49e9fd62d"
+MERGE (w1:Word {name: text[i]})
+MERGE (w2:Word {name: text[i+1]})
+MERGE (w1)-[:NEXT_WORD]->(w2)
+CREATE (w1)-[:CONTAINED_IN]->(c)
+
+MATCH(w:Word {name:"scholar."}), (c:Chunk {md5sum:"701978a0e81db41e6835ddc49e9fd62d"})
+CREATE (w)-[:CONTAINED_IN]->(c)
+
+-> Chunk 3
+WITH split("So hello, Mark. Yeah, it's a pleasure to have you here. Unfortunately, we cannot record this podcast at your gallery, at Autograph Gallery Rivington Place in Shoreditch,East London.", " ") as text
+UNWIND range(0, size(text)-2) AS i
+MATCH(c:Chunk)
+WHERE c.md5sum="614abc0d5155c15ecf37c0d4db3f82b5"
+MERGE (w1:Word {name: text[i]})
+MERGE (w2:Word {name: text[i+1]})
+MERGE (w1)-[:NEXT_WORD]->(w2)
+CREATE (w1)-[:CONTAINED_IN]->(c)
+
+MATCH(w:Word {name:"London."}), (c:Chunk {md5sum:"614abc0d5155c15ecf37c0d4db3f82b5"})
+CREATE (w)-[:CONTAINED_IN]->(c)
+
+-> Chunk 4
+WITH split("I love the space very much. Mark, would you like to tell us a little bit about the history of the place and and also about the intentions to set up a place, like a physical space like Autograph in East London?", " ") as text
+UNWIND range(0, size(text)-2) AS i
+MATCH(c:Chunk)
+WHERE c.md5sum="71a746605697ef144f9322ef37814f13"
+MERGE (w1:Word {name: text[i]})
+MERGE (w2:Word {name: text[i+1]})
+MERGE (w1)-[:NEXT_WORD]->(w2)
+CREATE (w1)-[:CONTAINED_IN]->(c)
+
+MATCH(w:Word {name:"London?"}), (c:Chunk {md5sum:"71a746605697ef144f9322ef37814f13"})
+CREATE (w)-[:CONTAINED_IN]->(c)
+
+-> Chunk 5
+WITH split("That's a very, interesting question, because it's kind of like all, all histories, it's multilayered.", " ") as text
+UNWIND range(0, size(text)-2) AS i
+MATCH(c:Chunk)
+WHERE c.md5sum="cc980bcc6ad2fa883e219a86f0d3cef5"
+MERGE (w1:Word {name: text[i]})
+MERGE (w2:Word {name: text[i+1]})
+MERGE (w1)-[:NEXT_WORD]->(w2)
+CREATE (w1)-[:CONTAINED_IN]->(c)
+
+MATCH(w:Word {name:"multilayered."}), (c:Chunk {md5sum:"cc980bcc6ad2fa883e219a86f0d3cef5"})
+CREATE (w)-[:CONTAINED_IN]->(c)
+
+
+ADD Summmaries 1 & 2 for 2-Wolfgang chunk
+CREATE(s:Summary {name:"Summary 1: 2-Wolfgang", summary_id: "211fc49dfc61001714bb0f6d34d55f97", compression: 44.39, aim: 35, deviation: 9.39})
+CREATE(s:Summary {name:"Summary 2: 2-Wolfgang", summary_id: "21fd51da567b8168a4fa3f12749fcc12", compression: 52.26, aim: 55, deviation: 2.74})
+
+WITH split("Mark Sealy is the curator, writer and director of The Association of Black Photographers in London.", " ") as text
+UNWIND range(0, size(text)-2) AS i
+MATCH(s1:Summary)
+WHERE s1.summary_id="211fc49dfc61001714bb0f6d34d55f97"
+MERGE (w1:Word {name: text[i]})
+MERGE (w2:Word {name: text[i+1]})
+MERGE (w1)-[:NEXT_WORD]->(w2)
+CREATE (w1)-[:CONTAINED_IN]->(s1)
+
+MATCH(w:Word {name:"London."}), (s1:Summary {summary_id:"211fc49dfc61001714bb0f6d34d55f97"})
+CREATE (w)-[:CONTAINED_IN]->(s1)
+
+WITH split("Mark Sealy is the curator, writer and director of The Association of Black Photographers in London. He is also a photography expert and scholar.", " ") as text
+UNWIND range(0, size(text)-2) AS i
+MATCH(s2:Summary)
+WHERE s2.summary_id="21fd51da567b8168a4fa3f12749fcc12"
+MERGE (w1:Word {name: text[i]})
+MERGE (w2:Word {name: text[i+1]})
+MERGE (w1)-[:NEXT_WORD]->(w2)
+CREATE (w1)-[:CONTAINED_IN]->(s2)
+
+MATCH(w:Word {name:"London."}), (s2:Summary {summary_id:"21fd51da567b8168a4fa3f12749fcc12"})
+CREATE (w)-[:CONTAINED_IN]->(s2)
+
+CONNECT Summaries with Chunk
+MATCH(s1:Summary {summary_id:"211fc49dfc61001714bb0f6d34d55f97"}), (s2:Summary {summary_id:"21fd51da567b8168a4fa3f12749fcc12"}), (c:Chunk {name:"2-Wolfgang.mp3"})
+CREATE (s1)-[:BELONGS_TO]->(c), (s2)-[:BELONGS_TO]->(c)
+
+ADD Entity Basics
+CREATE(e:ENTITY {name:"ENTITY"}), (o:ORG {name:"ORG"}), (p:PERSON {name:"PERSON"}), (org:Org {name:"ECHHR"}), (p1:Person {name:"Wolfgang"})
+
+MATCH (e:ENTITY {name:"ENTITY"}), (o:ORG {name:"ORG"}), (p:PERSON {name:"PERSON"}), (org:Org {name:"ECHHR"}), (p1:Person {name:"Wolfgang"}), (c:Chunk {name:"2-Wolfgang.mp3"}), (co:Collection {name:"Wolfgang-Mark"})
+CREATE (o)-[:IS]->(e), (p)-[:IS]->(e), (org)-[:IS]->(o), (p1)-[:SAYS]->(c), (p1)-[:IS]->(p), (co)-[:PUBLISHED_BY]->(org)
+
+MATCH (w:Word {name:"ECCHR"}),(org:Org {name:"Org"})
+
+CONNECTIONS Chunk-Sequence
+MATCH (c1:Chunk {name:"1-Wolfgang.mp3"}), (c2:Chunk {name:"2-Wolfgang.mp3"}), (c3:Chunk {name:"3-Wolfgang.mp3"}), (c4:Chunk {name:"4-Wolfgang.mp3"}), (c5:Chunk {name:"5-Mark.mp3"})
+CREATE (c1)-[:NEXT_CHUNK]->(c2), (c2)-[:NEXT_CHUNK]->(c3), (c3)-[:NEXT_CHUNK]->(c4), (c4)-[:NEXT_CHUNK]->(c5)
+
+SIMILARITY Connections
+a) [:SIMILARITY {similarity: 0.456}]
+b) [:similarity*0.456] - has to be modified not working yet
+MATCH (c3:Chunk {name:"3-Wolfgang.mp3"}), (c4:Chunk {name:"4-Wolfgang.mp3"})
+CREATE (c4)-[:SIMILARITY {similarity: 0.456}]->(c3)
+
+RENAMING node properties
+MATCH (c:Chunk)
+WITH collect(c) AS chunk
+CALL apoc.refactor.rename.nodeProperty("md5sum", "chunk_id", chunk)
+YIELD committedOperations
+RETURN committedOperations
+
+MATCH (co:Collection)
+WITH collect(co) AS collection
+CALL apoc.refactor.rename.nodeProperty("md5sum", "collection_id", collection)
+YIELD committedOperations
+RETURN committedOperations
+
+FUZZY Searches / Fuzzy Query Results
+MATCH (w:Word)
+WHERE w.name STARTS WITH 'ECCHR'
+RETURN w.name, ID(w)
+
+MATCH (w:Word)
+WHERE w.name =~ 'ECCHR.*'
+RETURN w.name, ID(w)
+
+
+-------------------------------------------------------------------------------------
+
+--> Cypher Blocks <--
+
+Add Collection
+CREATE(c:Collection {name:"Wolfgang-Mark", md5sum: "4ece0d064575609367f665d617d95d30", duration: 0, src: "", type:""})
+
+Add Chunk
+CREATE(c1:Chunk {name:"1-Wolfgang.mp3", md5sum: "87bd38fd5dc6ea68519703b8b1c18108"})
+CREATE(c2:Chunk {name:"2-Wolfgang.mp3", md5sum: "701978a0e81db41e6835ddc49e9fd62d"})
+CREATE(c3:Chunk {name:"3-Wolfgang.mp3", md5sum: "614abc0d5155c15ecf37c0d4db3f82b5"})
+CREATE(c4:Chunk {name:"4-Wolfgang.mp3", md5sum: "71a746605697ef144f9322ef37814f13"})
+CREATE(c5:Chunk {name:"5-Mark.mp3", md5sum: "cc980bcc6ad2fa883e219a86f0d3cef5"})
+
+Connect Chunk and Collection
+MATCH (ch1:Chunk {md5sum:"87bd38fd5dc6ea68519703b8b1c18108"}),(ch2:Chunk {md5sum:"701978a0e81db41e6835ddc49e9fd62d"}),(ch3:Chunk {md5sum:"614abc0d5155c15ecf37c0d4db3f82b5"}),(ch4:Chunk {md5sum:"71a746605697ef144f9322ef37814f13"}),(ch5:Chunk {md5sum:"cc980bcc6ad2fa883e219a86f0d3cef5"}),(co:Collection {md5sum:"4ece0d064575609367f665d617d95d30"})
+CREATE (ch1)-[:CONTAINED_IN]->(co), (ch2)-[:CONTAINED_IN]->(co), (ch3)-[:CONTAINED_IN]->(co), (ch4)-[:CONTAINED_IN]->(co), (ch5)-[:CONTAINED_IN]->(co)
+
+Unwrap Chunk Content
+WITH split("That's a very, interesting question, because it's kind of like all, all histories, it's multilayered.", " ") as text
+UNWIND range(0, size(text)-2) AS i
+MATCH(c:Chunk)
+WHERE c.md5sum="cc980bcc6ad2fa883e219a86f0d3cef5"
+MERGE (w1:Word {name: text[i]})
+MERGE (w2:Word {name: text[i+1]})
+MERGE (w1)-[:NEXT_WORD]->(w2)
+CREATE (w1)-[:CONTAINED_IN]->(c)
+
+Connect last word -> has to be improved
+MATCH(w:Word {name:"multilayered."}), (c:Chunk {md5sum:"cc980bcc6ad2fa883e219a86f0d3cef5"})
+CREATE (w)-[:CONTAINED_IN]->(c)
+
+Delete Everything
+match(n)
+detach delete(n)
+
+
