@@ -8,32 +8,24 @@ from endpoints.graph.functions import *
 
 graph = Blueprint('graph', __name__)
 
-@graph.route('/find/chunk', methods=['POST', 'GET'])
-def return_chunk():
+@graph.route('/find', methods=['POST', 'GET'])
+def return_node():
     # Parse input parameters from request
     if request_type(request) == 'application/json':
         # parse request values from JSON
-        chunk_id = request.get_json()["chunk_id"]
-        # chunk_name = request.get_json()[]
+        data_json = request.json
+        json_key=[*data_json][0]
+        search=request.get_json()[json_key]
+
     else:
         raise_error("json expected")
 
-    if not chunk_id:
-        raise_error("no id specified")
+    # if not chunk_id:
+    #     raise_error("no id specified")
 
-    # calculate response via summarize function
-    nodes = find_node(chunk_id)
+    nodes = find_node(search)
 
-    if response_type(request) == "text/plain":
-        try:
-            response = make_response(summary["summary"][0])
-            response.mimetype = 'text/plain'
-            return response
-        except Exception as ex:
-            traceback.print_exc()
-            return {'status': 'failed', 'error': str(ex)}
-
-    elif response_type(request) == "application/json":
+    if response_type(request) == "application/json":
         try:
             response = make_response(json.dumps(nodes))
             response.mimetype = 'application/json'
@@ -41,14 +33,59 @@ def return_chunk():
         except Exception as ex:
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
+            
 
-@graph.route('/find/chunk/<string:node_id>', methods=['GET', 'POST'])
-def return_chunk_viaGET(node_id):
-    nodes = find_node(node_id)
+@graph.route('/find/chunk', methods=['POST', 'GET'])
+def return_chunk():
+    data_json = request.json
+    json_key=[*data_json][0]
+    search=request.get_json()[json_key]
+
+    nodes = find_chunk(search)
 
     response = make_response(json.dumps(nodes))
     response.mimetype = 'application/json'
     return response
+
+
+@graph.route('/find/chunk/<string:node_id>', methods=['POST','GET'])
+def return_chunk_viaGET(node_id):
+    nodes = find_chunk(node_id)
+
+    response = make_response(json.dumps(nodes))
+    response.mimetype = 'application/json'
+    return response
+
+
+@graph.route('/add/chunk', methods=['POST', 'GET'])
+def add_chunk():
+    # Parse input parameters from request
+    if request_type(request) == 'application/json':
+        # parse request values from JSON
+        text = request.get_json()["text"]
+        source_file = request.get_json()["source_file"]
+        start_time = request.get_json()["start_time"]
+        end_time = request.get_json()["end_time"]
+        summaries  = request.get_json()["summaries"]
+        entities  = request.get_json()["entities"]
+        similarity  = request.get_json()["similarity"]
+    else:
+        raise_error("json expected")
+
+    # if not chunk_id:
+    #     raise_error("no id specified")
+
+    chunk = add_node(text, source_file, start_time, end_time, summaries, entities, similarity)
+
+    if response_type(request) == "application/json":
+        try:
+            response = make_response(json.dumps(chunk))
+            response.mimetype = 'application/json'
+            return response
+        except Exception as ex:
+            traceback.print_exc()
+            return {'status': 'failed', 'error': str(ex)}
+
     
 
 # TODO: add missing endpoints:

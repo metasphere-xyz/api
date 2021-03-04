@@ -151,6 +151,13 @@ MATCH (w:Word)
 WHERE w.name =~ 'ECCHR.*'
 RETURN w.name, ID(w)
 
+-> ADD/OVERWRITE additional properties to chunk or modify their values
+MATCH(c:Chunk {chunk_id:'dd7536794b63bf90eccfd37f9b147d7f'})
+SET c.name='6-Mark'
+
+MATCH (n {chunk_id: '87bd38fd5dc6ea68519703b8b1c18108'})
+SET n.text = 'So, hello everybody, to the latest edition of our podcast by ECCHR, European Center for Constitutional and Human Rights in Berlin.', n.source_file='1-Wolfgang.mp3', n.start_time=0.21, n.end_time=12.33, n.summaries=[], n.entities=[], n.similarity=[] 
+RETURN n.name
 
 -------------------------------------------------------------------------------------
 
