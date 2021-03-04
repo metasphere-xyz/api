@@ -86,6 +86,27 @@ def add_chunk():
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
 
+@graph.route('/unwrap/chunk', methods=['POST', 'GET'])
+def add_unwrap_chunk():
+    if request_type(request) == 'application/json':
+        # parse request values from JSON
+        text = request.get_json()["text"]
+        source_file = request.get_json()["source_file"]
+    else:
+        raise_error("json expected")
+
+
+    unwrap_chunk = add_unwrap_node(text, source_file)
+
+    if response_type(request) == "application/json":
+        try:
+            response = make_response(json.dumps(unwrap_chunk))
+            response.mimetype = 'application/json'
+            return response
+        except Exception as ex:
+            traceback.print_exc()
+            return {'status': 'failed', 'error': str(ex)}
+
 
 @graph.route('/connect/chunk', methods=['POST', 'GET'])
 def connect_chunk():

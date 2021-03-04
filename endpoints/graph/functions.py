@@ -89,6 +89,44 @@ def add_node(text, source_file, start_time, end_time, summaries, entities, simil
     response['node']=result
     return response
 
+def add_unwrap_node(text, source_file):
+    hash = hashlib.md5(text[0].encode("utf-8"))
+    chunk_id = hash.hexdigest()
+
+    query_1 = '''
+        WITH split($text, " ") as words
+        
+        CREATE(c:Chunk {chunk_id: $chunk_id, name: $source_file})
+        FOREACH (w IN words |
+            MERGE (wo:Word {name: w})
+            MERGE (wo)-[:CONTAINED_IN]->(c))
+        RETURN c as chunk
+    '''
+
+    query_2 = '''
+        WITH split($text, " ") as words
+        WITH words as text
+        UNWIND range(0, size(text)-2) AS i
+        MATCH (w1:Word {name: text[i]})
+        MATCH (w2:Word {name: text[i+1]})
+        MERGE (w1)-[:NEXT_WORD]->(w2)
+    '''
+
+    result = graph.run(query_1, parameters={
+        'text': text,
+        'source_file': source_file,
+        'chunk_id': chunk_id
+        }).data()
+    
+    graph.run(query_2, parameters={
+        'text': text
+    })
+
+    result = result[0]['chunk']
+    response['node']=result
+    return response
+
+
 def connect_nodes(connect, with_id, with_score):
     query = '''
         MATCH(n1 {chunk_id:$start_id}),(n2 {chunk_id:$end_id})

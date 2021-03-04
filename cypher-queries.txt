@@ -163,6 +163,25 @@ RETURN n.name
 MATCH (n {name: '1-Wolfgang'})-[r:SIMILARITY]->()
 DELETE r
 
+-> CONNECT all nodes from a list with a central node
+MERGE (me:User { userId: {userId} })
+SET me.name = {name}
+FOREACH(f IN {friends} |
+    MERGE (u:User {userId: f.userId })
+    SET u = f
+    MERGE (me)-[:FRIENDS_WITH]->(u))
+
+-> ADD Chunk and Unwrap
+WITH ['This', 'is', 'a', 'test.'] as words
+MERGE (c:Chunk { chunk_id: 1 , name: 'Test Chunk'})
+FOREACH(w IN words |
+    MERGE (wo:Word {name: w })
+    MERGE (wo)-[:CONTAINED_IN]->(c))
+    WITH words as text
+    UNWIND range(0, size(text)-2) AS i
+    MATCH (w1:Word {name: text[i]})
+    MATCH (w2:Word {name: text[i+1]})
+    MERGE (w1)-[:NEXT_WORD]->(w2)     
 -------------------------------------------------------------------------------------
 
 --> Cypher Blocks <--
