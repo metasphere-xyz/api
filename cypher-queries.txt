@@ -159,6 +159,10 @@ MATCH (n {chunk_id: '87bd38fd5dc6ea68519703b8b1c18108'})
 SET n.text = 'So, hello everybody, to the latest edition of our podcast by ECCHR, European Center for Constitutional and Human Rights in Berlin.', n.source_file='1-Wolfgang.mp3', n.start_time=0.21, n.end_time=12.33, n.summaries=[], n.entities=[], n.similarity=[] 
 RETURN n.name
 
+-> DELETE Relationship between two nodes
+MATCH (n {name: '1-Wolfgang'})-[r:SIMILARITY]->()
+DELETE r
+
 -------------------------------------------------------------------------------------
 
 --> Cypher Blocks <--

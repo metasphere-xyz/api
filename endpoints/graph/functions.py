@@ -15,6 +15,28 @@ response = {
         }
     }
 
+response_connect = {
+    "status": "success",
+    "connected": {},
+    "with": {
+            "node": {
+    
+            },
+            "score": 0
+    }
+}
+
+response_disconnect = {
+    "status": "success",
+    "disconnected": {},
+    "from": {
+            "node": {
+    
+            },
+            "relation": ""
+    }
+}
+
 # graph functions / cypher commands
 
 # This function find all nodes independent from the Label
@@ -79,6 +101,34 @@ def connect_nodes(connect, with_id, with_score):
         'end_id': with_id,
         'similarity': with_score
         }).data()
+
+    start_chunk = result[0]['n1']
+    end_chunk = result[0]['n2']
     
-    return result
+    response_connect['connected']=start_chunk
+    response_connect['with']['node']=end_chunk
+    response_connect['with']['score']=with_score
+
+    return response_connect
+
+def disconnect_nodes(disconnect, from_id, from_relation):
+    query = '''
+        MATCH (c:Chunk {chunk_id: $chunk_id})-[r:CONTAINED_IN]->(co:Collection {collection_id: $collection_id})
+        DELETE r
+        RETURN c, co, r
+    '''
+
+    result = graph.run(query, parameters={
+        'chunk_id': disconnect,
+        'collection_id': from_id
+        }).data()
+
+    chunk = result[0]['c']
+    collection = result[0]['co']
+    
+    response_disconnect['disconnected']=chunk
+    response_disconnect['from']['node']=collection
+    response_disconnect['from']['relation']=from_relation
+
+    return response_disconnect
     

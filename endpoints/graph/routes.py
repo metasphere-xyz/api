@@ -109,6 +109,28 @@ def connect_chunk():
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
 
+
+@graph.route('/disconnect/chunk', methods=['POST', 'GET'])
+def disconnect_chunk():
+    if request_type(request) == 'application/json':
+        # parse request values from JSON
+        disconnect = request.get_json()["disconnect"]
+        from_id = request.get_json()["from"]["id"]
+        from_relation = request.get_json()["from"]["relation"]
+        
+    else:
+        raise_error("json expected")
+    
+    disconnected_nodes = disconnect_nodes(disconnect, from_id, from_relation)
+
+    if response_type(request) == "application/json":
+        try:
+            response = make_response(json.dumps(disconnected_nodes))
+            response.mimetype = 'application/json'
+            return response
+        except Exception as ex:
+            traceback.print_exc()
+            return {'status': 'failed', 'error': str(ex)}
     
 
 
