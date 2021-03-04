@@ -33,7 +33,7 @@ def return_node():
         except Exception as ex:
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
-            
+
 
 @graph.route('/find/chunk', methods=['POST', 'GET'])
 def return_chunk():
@@ -86,7 +86,31 @@ def add_chunk():
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
 
+
+@graph.route('/connect/chunk', methods=['POST', 'GET'])
+def connect_chunk():
+    if request_type(request) == 'application/json':
+        # parse request values from JSON
+        connect = request.get_json()["connect"]
+        with_id = request.get_json()["with"]["id"]
+        with_score = request.get_json()["with"]["score"]
+        
+    else:
+        raise_error("json expected")
     
+    connected_nodes = connect_nodes(connect, with_id, with_score)
+
+    if response_type(request) == "application/json":
+        try:
+            response = make_response(json.dumps(connected_nodes))
+            response.mimetype = 'application/json'
+            return response
+        except Exception as ex:
+            traceback.print_exc()
+            return {'status': 'failed', 'error': str(ex)}
+
+    
+
 
 # TODO: add missing endpoints:
 # /graph/find/chunk

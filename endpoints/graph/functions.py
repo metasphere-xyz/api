@@ -66,4 +66,19 @@ def add_node(text, source_file, start_time, end_time, summaries, entities, simil
     result = result[0]['chunk']
     response['node']=result
     return response
+
+def connect_nodes(connect, with_id, with_score):
+    query = '''
+        MATCH(n1 {chunk_id:$start_id}),(n2 {chunk_id:$end_id})
+        CREATE (n1)-[:SIMILARITY {similarity:$similarity}]->(n2)
+        RETURN n1, n2
+    '''
+
+    result = graph.run(query, parameters={
+        'start_id':connect,
+        'end_id': with_id,
+        'similarity': with_score
+        }).data()
+    
+    return result
     
