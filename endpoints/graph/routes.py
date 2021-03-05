@@ -42,13 +42,6 @@ def return_chunk():
         json_key=[*data_json][0]
         search=request.get_json()[json_key]
 
-        # if key=='id':
-        #     search = request.get_json()['id']
-        # elif key=='text':
-        #     search = request.get_json()['text']
-        # else: 
-        #     return 'no id or text specified'
-
     chunk = find_chunk(search)
 
     response = make_response(json.dumps(chunk))

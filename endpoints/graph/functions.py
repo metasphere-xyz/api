@@ -9,25 +9,7 @@ graph = Graph(
     auth=('neo4j', 'burr-query-duel-cherry')
 )
 
-def submit(query, parameters):
-    try:
-        result = graph.run(query, parameters).data()
-        result=result[0]['db_return']
-        return result
-    except:
-        message = {
-            "status": "error",
-            "message": "could not find node (" + str(404) + ")"
-        }
-        return message
-
-
-response = {
-    "status": "success",
-    "node": {
-
-    }
-}
+response = {}
 
 response_connect = {
     "status": "success",
@@ -50,6 +32,19 @@ response_disconnect = {
         "relation": ""
     }
 }
+
+def submit(query, parameters):
+    try:
+        result = graph.run(query, parameters).data()
+        result=result[0]['db_return']
+        response['status']='success'
+        response['instance']=result
+        return response
+    except:
+        response['status']='failed'
+        response['message'] = "could not find instance (" + str(404) + ")"
+        response['instance']= parameters
+        return response
 
 # graph functions / cypher commands
 
@@ -77,17 +72,12 @@ def find_node(search):
 def find_chunk(chunk):
     query = '''
         MATCH (c:Chunk)
-        WHERE c.chunk_id=$chunk_search or c.text=$chunk_search or c.name=$chunk_search
+        WHERE c.chunk_id=$chunk or c.text=$chunk or c.name=$chunk
         RETURN c as db_return
     '''
 
-    parameters={'chunk_search': chunk}
-
-    result = submit(query, parameters)
-
-    # result = graph.run(query, parameters={'chunk_search': chunk}).data()
-    # result = result[0]['c']
-    response['node']=result
+    parameters={'chunk': chunk}
+    response = submit(query, parameters)
     return response
 
 # TODO: add missing functions for other endpoints
