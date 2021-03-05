@@ -9,20 +9,20 @@ graph = Graph(
 )
 
 response = {
-        "status": "success",
-        "node": {
+    "status": "success",
+    "node": {
 
-        }
     }
+}
 
 response_connect = {
     "status": "success",
     "connected": {},
     "with": {
-            "node": {
-    
-            },
-            "score": 0
+        "node": {
+
+        },
+        "score": 0
     }
 }
 
@@ -30,16 +30,18 @@ response_disconnect = {
     "status": "success",
     "disconnected": {},
     "from": {
-            "node": {
-    
-            },
-            "relation": ""
+        "node": {
+
+        },
+        "relation": ""
     }
 }
 
 # graph functions / cypher commands
 
 # This function find all nodes independent from the Label
+
+
 def find_node(search):
     query = '''
         MATCH (n)
@@ -48,10 +50,12 @@ def find_node(search):
     '''
     result = graph.run(query, parameters={'search': search}).data()
     result = result[0]['n']
-    response['node']=result
+    response['node'] = result
     return response
 
 # This function find just the nodes with the Label "Chunk"
+
+
 def find_chunk(chunk):
     query = '''
         MATCH (c:Chunk)
@@ -60,10 +64,11 @@ def find_chunk(chunk):
     '''
     result = graph.run(query, parameters={'chunk_search': chunk}).data()
     result = result[0]['c']
-    response['node']=result
+    response['node'] = result
     return response
 
 # TODO: add missing functions for other endpoints
+
 
 def add_node(text, source_file, start_time, end_time, summaries, entities, similarity):
     hash = hashlib.md5(text[0].encode("utf-8"))
@@ -76,18 +81,19 @@ def add_node(text, source_file, start_time, end_time, summaries, entities, simil
 
     result = graph.run(query, parameters={
         'chunk_id': chunk_id,
-        'text': text, 
-        'source_file': source_file, 
-        'start_time': start_time, 
+        'text': text,
+        'source_file': source_file,
+        'start_time': start_time,
         'end_time': end_time,
         'summaries': [],
         'entities': [],
         'similarity': []
-        }).data()
+    }).data()
 
     result = result[0]['chunk']
-    response['node']=result
+    response['node'] = result
     return response
+
 
 def add_unwrap_node(text, source_file):
     hash = hashlib.md5(text[0].encode("utf-8"))
@@ -95,7 +101,7 @@ def add_unwrap_node(text, source_file):
 
     query_1 = '''
         WITH split($text, " ") as words
-        
+
         CREATE(c:Chunk {chunk_id: $chunk_id, name: $source_file})
         FOREACH (w IN words |
             MERGE (wo:Word {name: w})
@@ -116,14 +122,14 @@ def add_unwrap_node(text, source_file):
         'text': text,
         'source_file': source_file,
         'chunk_id': chunk_id
-        }).data()
-    
+    }).data()
+
     graph.run(query_2, parameters={
         'text': text
     })
 
     result = result[0]['chunk']
-    response['node']=result
+    response['node'] = result
     return response
 
 
@@ -135,19 +141,20 @@ def connect_nodes(connect, with_id, with_score):
     '''
 
     result = graph.run(query, parameters={
-        'start_id':connect,
+        'start_id': connect,
         'end_id': with_id,
         'similarity': with_score
-        }).data()
+    }).data()
 
     start_chunk = result[0]['n1']
     end_chunk = result[0]['n2']
-    
-    response_connect['connected']=start_chunk
-    response_connect['with']['node']=end_chunk
-    response_connect['with']['score']=with_score
+
+    response_connect['connected'] = start_chunk
+    response_connect['with']['node'] = end_chunk
+    response_connect['with']['score'] = with_score
 
     return response_connect
+
 
 def disconnect_nodes(disconnect, from_id, from_relation):
     query = '''
@@ -159,14 +166,13 @@ def disconnect_nodes(disconnect, from_id, from_relation):
     result = graph.run(query, parameters={
         'chunk_id': disconnect,
         'collection_id': from_id
-        }).data()
+    }).data()
 
     chunk = result[0]['c']
     collection = result[0]['co']
-    
-    response_disconnect['disconnected']=chunk
-    response_disconnect['from']['node']=collection
-    response_disconnect['from']['relation']=from_relation
+
+    response_disconnect['disconnected'] = chunk
+    response_disconnect['from']['node'] = collection
+    response_disconnect['from']['relation'] = from_relation
 
     return response_disconnect
-    
