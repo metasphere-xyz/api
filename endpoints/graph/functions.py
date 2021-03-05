@@ -1,5 +1,6 @@
 import hashlib
 md5 = hashlib.md5()
+from http import HTTPStatus
 
 from py2neo import Graph
 graph = Graph(
@@ -7,6 +8,19 @@ graph = Graph(
     "bolt://ecchr.metasphere.xyz:7687/",
     auth=('neo4j', 'burr-query-duel-cherry')
 )
+
+def submit(query, parameters):
+    try:
+        result = graph.run(query, parameters).data()
+        result=result[0]['db_return']
+        return result
+    except:
+        message = {
+            "status": "error",
+            "message": "could not find node (" + str(404) + ")"
+        }
+        return message
+
 
 response = {
         "status": "success",
@@ -56,10 +70,15 @@ def find_chunk(chunk):
     query = '''
         MATCH (c:Chunk)
         WHERE c.chunk_id=$chunk_search or c.text=$chunk_search or c.name=$chunk_search
-        RETURN c
+        RETURN c as db_return
     '''
-    result = graph.run(query, parameters={'chunk_search': chunk}).data()
-    result = result[0]['c']
+
+    parameters={'chunk_search': chunk}
+
+    result = submit(query, parameters)
+
+    # result = graph.run(query, parameters={'chunk_search': chunk}).data()
+    # result = result[0]['c']
     response['node']=result
     return response
 
