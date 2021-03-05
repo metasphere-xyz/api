@@ -49,9 +49,13 @@ def find_node(search):
         RETURN n
     '''
     result = graph.run(query, parameters={'search': search}).data()
-    result = result[0]['n']
-    response['node'] = result
-    return response
+    if result:
+        result = result[0]['n']
+        response['node'] = result
+        return response
+    else:
+        response["status"] = "failed"
+        return response
 
 # This function find just the nodes with the Label "Chunk"
 
