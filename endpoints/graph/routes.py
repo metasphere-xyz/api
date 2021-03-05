@@ -18,14 +18,14 @@ def return_node():
         search=request.get_json()[json_key]
 
     else:
-        raise_error("json expected")
+        raise_error('json expected')
 
     # if not chunk_id:
-    #     raise_error("no id specified")
+    #     raise_error('no id specified')
 
     nodes = find_node(search)
 
-    if response_type(request) == "application/json":
+    if response_type(request) == 'application/json':
         try:
             response = make_response(json.dumps(nodes))
             response.mimetype = 'application/json'
@@ -37,13 +37,21 @@ def return_node():
 
 @graph.route('/find/chunk', methods=['POST', 'GET'])
 def return_chunk():
-    data_json = request.json
-    json_key=[*data_json][0]
-    search=request.get_json()[json_key]
+    if request_type(request) == 'application/json':
+        data_json = request.json
+        json_key=[*data_json][0]
+        search=request.get_json()[json_key]
 
-    nodes = find_chunk(search)
+        # if key=='id':
+        #     search = request.get_json()['id']
+        # elif key=='text':
+        #     search = request.get_json()['text']
+        # else: 
+        #     return 'no id or text specified'
 
-    response = make_response(json.dumps(nodes))
+    chunk = find_chunk(search)
+
+    response = make_response(json.dumps(chunk))
     response.mimetype = 'application/json'
     return response
 
@@ -57,27 +65,40 @@ def return_chunk_viaGET(node_id):
     return response
 
 
+@graph.route('/find/entity', methods=['POST', 'GET'])
+def return_entity():
+    data_json = request.json
+    json_key=[*data_json][0]
+    search=request.get_json()[json_key]
+
+    nodes = find_chunk(search)
+
+    response = make_response(json.dumps(nodes))
+    response.mimetype = 'application/json'
+    return response
+
+
 @graph.route('/add/chunk', methods=['POST', 'GET'])
 def add_chunk():
     # Parse input parameters from request
     if request_type(request) == 'application/json':
         # parse request values from JSON
-        text = request.get_json()["text"]
-        source_file = request.get_json()["source_file"]
-        start_time = request.get_json()["start_time"]
-        end_time = request.get_json()["end_time"]
-        summaries  = request.get_json()["summaries"]
-        entities  = request.get_json()["entities"]
-        similarity  = request.get_json()["similarity"]
+        text = request.get_json()['text']
+        source_file = request.get_json()['source_file']
+        start_time = request.get_json()['start_time']
+        end_time = request.get_json()['end_time']
+        summaries  = request.get_json()['summaries']
+        entities  = request.get_json()['entities']
+        similarity  = request.get_json()['similarity']
     else:
-        raise_error("json expected")
+        raise_error('json expected')
 
     # if not chunk_id:
-    #     raise_error("no id specified")
+    #     raise_error('no id specified')
 
     chunk = add_node(text, source_file, start_time, end_time, summaries, entities, similarity)
 
-    if response_type(request) == "application/json":
+    if response_type(request) == 'application/json':
         try:
             response = make_response(json.dumps(chunk))
             response.mimetype = 'application/json'
@@ -86,19 +107,20 @@ def add_chunk():
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
 
+
 @graph.route('/unwrap/chunk', methods=['POST', 'GET'])
 def add_unwrap_chunk():
     if request_type(request) == 'application/json':
         # parse request values from JSON
-        text = request.get_json()["text"]
-        source_file = request.get_json()["source_file"]
+        text = request.get_json()['text']
+        source_file = request.get_json()['source_file']
     else:
-        raise_error("json expected")
+        raise_error('json expected')
 
 
     unwrap_chunk = add_unwrap_node(text, source_file)
 
-    if response_type(request) == "application/json":
+    if response_type(request) == 'application/json':
         try:
             response = make_response(json.dumps(unwrap_chunk))
             response.mimetype = 'application/json'
@@ -112,16 +134,16 @@ def add_unwrap_chunk():
 def connect_chunk():
     if request_type(request) == 'application/json':
         # parse request values from JSON
-        connect = request.get_json()["connect"]
-        with_id = request.get_json()["with"]["id"]
-        with_score = request.get_json()["with"]["score"]
+        connect = request.get_json()['connect']
+        with_id = request.get_json()['with']['id']
+        with_score = request.get_json()['with']['score']
         
     else:
-        raise_error("json expected")
+        raise_error('json expected')
     
     connected_nodes = connect_nodes(connect, with_id, with_score)
 
-    if response_type(request) == "application/json":
+    if response_type(request) == 'application/json':
         try:
             response = make_response(json.dumps(connected_nodes))
             response.mimetype = 'application/json'
@@ -135,16 +157,16 @@ def connect_chunk():
 def disconnect_chunk():
     if request_type(request) == 'application/json':
         # parse request values from JSON
-        disconnect = request.get_json()["disconnect"]
-        from_id = request.get_json()["from"]["id"]
-        from_relation = request.get_json()["from"]["relation"]
+        disconnect = request.get_json()['disconnect']
+        from_id = request.get_json()['from']['id']
+        from_relation = request.get_json()['from']['relation']
         
     else:
-        raise_error("json expected")
+        raise_error('json expected')
     
     disconnected_nodes = disconnect_nodes(disconnect, from_id, from_relation)
 
-    if response_type(request) == "application/json":
+    if response_type(request) == 'application/json':
         try:
             response = make_response(json.dumps(disconnected_nodes))
             response.mimetype = 'application/json'
