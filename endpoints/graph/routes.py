@@ -4,58 +4,70 @@ import json
 
 # Custom functions
 from functions import *
-from endpoints.graph.cypher import *
+from endpoints.graph.database import *
 from endpoints.graph.response import *
 
 graph = Blueprint('graph', __name__)
 
 @graph.route('/find', methods=['POST', 'GET'])
 def return_node():
-    # Parse input parameters from request
-    if request_type(request) == 'application/json':
-        search = get_single_json_value()
-    else:
-        raise_error('json expected')
-
+    search = get_single_json_value()
     # if not chunk_id:
     #     raise_error('no id specified')
-
     nodes = find_node(search)
-
-    if response_type(request) == 'application/json':
-        try:
-            return response_json(nodes)
-        except Exception as ex:
-            traceback.print_exc()
-            return {'status': 'failed', 'error': str(ex)}
-
+    response = response_is_json(nodes)
+    return response
 
 @graph.route('/find/chunk', methods=['POST', 'GET'])
 def return_chunk():
-    if request_type(request) == 'application/json':
-        search = get_single_json_value()
-
+    search = get_single_json_value()
     chunk = find_chunk(search)
-    return response_is_json(chunk)
-
+    response = response_is_json(chunk)
+    return response
 
 @graph.route('/find/chunk/<string:node_id>', methods=['POST','GET'])
 def return_chunk_viaGET(node_id):
     chunk = find_chunk(node_id)
-    return response_is_json(chunk)
-
+    response = response_is_json(chunk)
+    return response
 
 @graph.route('/find/entity', methods=['POST', 'GET'])
 def return_entity():
     search = get_single_json_value()
     entity = find_entity(search)
-    return response_is_json(entity)
+    response = response_is_json(entity)
+    return response
 
 @graph.route('/find/entity/<string:entity_id>', methods=['POST','GET'])
 def return_entity_viaGET(entity_id):
-    nodes = find_entity(entity_id)
-    return response_is_json(nodes)
+    entity = find_entity(entity_id)
+    response = response_is_json(entity)
+    return response
 
+@graph.route('/find/collection', methods=['POST', 'GET'])
+def return_collection():
+    search = get_single_json_value()
+    collection = find_collection(search)
+    response = response_is_json(collection)
+    return response
+
+@graph.route('/find/collection/<string:collection_id>', methods=['POST','GET'])
+def return_collection_viaGET(collection_id):
+    collection = find_collection(collection_id)
+    response = response_is_json(collection)
+    return response
+
+@graph.route('/find/summary', methods=['POST', 'GET'])
+def return_summary():
+    search = get_single_json_value()
+    summary = find_summary(search)
+    response = response_is_json(summary)
+    return response
+
+@graph.route('/find/summary/<string:summary_id>', methods=['POST','GET'])
+def return_summary_viaGET(summary_id):
+    summary = find_summary(summary_id)
+    return response_is_json(summary)
 
 @graph.route('/add/chunk', methods=['POST', 'GET'])
 def add_chunk():

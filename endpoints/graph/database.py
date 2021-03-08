@@ -11,19 +11,12 @@ graph = Graph(
 def find_node(search):
     query = '''
         MATCH (n)
-        WHERE n.chunk_id=$search or n.text=$search or n.name=$search or n.summary_id=$search or n.collection_id=$search
-        RETURN n
+        WHERE n.chunk_id=$search or n.text=$search or n.name=$search or n.summary_id=$search or n.collection_id=$search or n.entity_id=$search or n.name=$search
+        RETURN n as db_return
     '''
-    result = graph.run(query, parameters={'search': search}).data()
-    if result:
-        result = result[0]['n']
-        response['node'] = result
-        return response
-    else:
-        response["status"] = "failed"
-        return response
-
-# This function find just the nodes with the Label "Chunk"
+    parameters={'search': search}
+    response = submit_find(query, parameters)
+    return response
 
 def find_chunk(chunk):
     query = '''
@@ -31,7 +24,6 @@ def find_chunk(chunk):
         WHERE c.chunk_id=$chunk or c.text=$chunk or c.name=$chunk
         RETURN c as db_return
     '''
-
     parameters={'chunk': chunk}
     response = submit_find(query, parameters)
     return response
@@ -42,13 +34,29 @@ def find_entity(entity):
         WHERE e.entity_id=$entity or e.name=$entity
         RETURN e as db_return
     '''
-
     parameters={'entity': entity}
     response = submit_find(query, parameters)
     return response
 
-# TODO: add missing functions for other endpoints
+def find_collection(collection):
+    query = '''
+        MATCH (co:Collection)
+        WHERE co.collection_id=$collection or co.name=$collection
+        RETURN co as db_return
+    '''
+    parameters={'collection': collection}
+    response = submit_find(query, parameters)
+    return response
 
+def find_summary(summary):
+    query = '''
+        MATCH (s:Summary)
+        WHERE s.summary_id=$summary or s.name=$summary
+        RETURN s as db_return
+    '''
+    parameters={'summary': summary}
+    response = submit_find(query, parameters)
+    return response
 
 def add_node(text, source_file, start_time, end_time, summaries, entities, similarity):
     hash = hashlib.md5(text[0].encode("utf-8"))

@@ -40,10 +40,14 @@ response_disconnect = {
 }
 
 def get_single_json_value():
-    data_json = request.json
-    json_key=[*data_json][0]
-    search=request.get_json()[json_key]
-    return search
+    if request_type(request) == 'application/json':
+        data_json = request.json
+        json_key=[*data_json][0]
+        search=request.get_json()[json_key]
+        return search
+    else:
+        return 'json expected'
+        
 
 def response_is_json(graph_return):
     if response_type(request) == 'application/json':
@@ -54,6 +58,9 @@ def response_is_json(graph_return):
         except Exception as ex:
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
+    else:
+        return 'error'
+
  
 def submit_find(query, parameters):
     try:
