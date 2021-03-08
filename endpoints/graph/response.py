@@ -47,7 +47,20 @@ def get_single_json_value():
         return search
     else:
         return 'json expected'
-        
+
+def get_chunk_json_value():
+    if request_type(request) == 'application/json':
+        text = request.get_json()['text']
+        source_file = request.get_json()['source_file']
+        start_time = request.get_json()['start_time']
+        end_time = request.get_json()['end_time']
+        summaries  = request.get_json()['summaries']
+        entities  = request.get_json()['entities']
+        similarity  = request.get_json()['similarity']
+        collection_id  = request.get_json()['collection_id']
+        return text, source_file, start_time, end_time, summaries, entities, similarity, collection_id
+    else:
+        return 'json expected'
 
 def response_is_json(graph_return):
     if response_type(request) == 'application/json':
@@ -62,7 +75,7 @@ def response_is_json(graph_return):
         return 'error'
 
  
-def submit_find(query, parameters):
+def submit(query, parameters):
     try:
         result = graph.run(query, parameters).data()
         result=result[0]['db_return']
@@ -72,4 +85,3 @@ def submit_find(query, parameters):
         response_failed['message'] = "could not find instance (" + str(404) + ")"
         response_failed['instance']= parameters
         return response_failed
-

@@ -67,53 +67,43 @@ def return_summary():
 @graph.route('/find/summary/<string:summary_id>', methods=['POST','GET'])
 def return_summary_viaGET(summary_id):
     summary = find_summary(summary_id)
-    return response_is_json(summary)
+    response = response_is_json(summary)
+    return response
 
 @graph.route('/add/chunk', methods=['POST', 'GET'])
 def add_chunk():
-    # Parse input parameters from request
-    if request_type(request) == 'application/json':
-        # parse request values from JSON
-        text = request.get_json()['text']
-        source_file = request.get_json()['source_file']
-        start_time = request.get_json()['start_time']
-        end_time = request.get_json()['end_time']
-        summaries  = request.get_json()['summaries']
-        entities  = request.get_json()['entities']
-        similarity  = request.get_json()['similarity']
-    else:
-        raise_error('json expected')
+    text, source_file, start_time, end_time, summaries, entities, similarity, collection_id = get_chunk_json_value()
 
-    # if not chunk_id:
-    #     raise_error('no id specified')
-
-    chunk = add_node(text, source_file, start_time, end_time, summaries, entities, similarity)
-
-    if response_type(request) == 'application/json':
-        try:
-            return response_json(chunk)
-        except Exception as ex:
-            traceback.print_exc()
-            return {'status': 'failed', 'error': str(ex)}
-
+    chunk = add_chunk_to_collection(
+        text, 
+        source_file, 
+        start_time, 
+        end_time, 
+        summaries, 
+        entities, 
+        similarity, 
+        collection_id
+        )
+    response = response_is_json(chunk)
+    return response
 
 @graph.route('/unwrap/chunk', methods=['POST', 'GET'])
 def add_unwrap_chunk():
-    if request_type(request) == 'application/json':
-        # parse request values from JSON
-        text = request.get_json()['text']
-        source_file = request.get_json()['source_file']
-    else:
-        raise_error('json expected')
+    text, source_file, start_time, end_time, summaries, entities, similarity, collection_id = get_chunk_json_value()
 
-    unwrap_chunk = add_unwrap_node(text, source_file)
+    unwrap_chunk = add_unwrap_chunk_to_collection(
+        text, 
+        source_file, 
+        start_time, 
+        end_time, 
+        summaries, 
+        entities, 
+        similarity, 
+        collection_id
+    )
 
-    if response_type(request) == 'application/json':
-        try:
-            return response_json(unwrap_chunk)
-        except Exception as ex:
-            traceback.print_exc()
-            return {'status': 'failed', 'error': str(ex)}
+    response = response_is_json(unwrap_chunk)
+    return response
 
 
 @graph.route('/connect/chunk', methods=['POST', 'GET'])

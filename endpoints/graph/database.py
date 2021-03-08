@@ -15,7 +15,7 @@ def find_node(search):
         RETURN n as db_return
     '''
     parameters={'search': search}
-    response = submit_find(query, parameters)
+    response = submit(query, parameters)
     return response
 
 def find_chunk(chunk):
@@ -25,7 +25,7 @@ def find_chunk(chunk):
         RETURN c as db_return
     '''
     parameters={'chunk': chunk}
-    response = submit_find(query, parameters)
+    response = submit(query, parameters)
     return response
 
 def find_entity(entity):
@@ -35,7 +35,7 @@ def find_entity(entity):
         RETURN e as db_return
     '''
     parameters={'entity': entity}
-    response = submit_find(query, parameters)
+    response = submit(query, parameters)
     return response
 
 def find_collection(collection):
@@ -45,7 +45,7 @@ def find_collection(collection):
         RETURN co as db_return
     '''
     parameters={'collection': collection}
-    response = submit_find(query, parameters)
+    response = submit(query, parameters)
     return response
 
 def find_summary(summary):
@@ -55,19 +55,23 @@ def find_summary(summary):
         RETURN s as db_return
     '''
     parameters={'summary': summary}
-    response = submit_find(query, parameters)
+    response = submit(query, parameters)
     return response
 
-def add_node(text, source_file, start_time, end_time, summaries, entities, similarity):
+def add_chunk_to_collection(text, source_file, start_time, end_time, summaries, entities, similarity, collection_id):
     hash = hashlib.md5(text[0].encode("utf-8"))
     chunk_id = hash.hexdigest()
-
-    query = '''
+    query_1 = '''
         CREATE(c:Chunk {name: $source_file, chunk_id: $chunk_id, source_file: $source_file, start_time: $start_time, end_time: $end_time, text: $text, summaries: $summaries, entities: $entities, similarity: $similarity})
-        RETURN c as chunk
+        RETURN c as db_return
     '''
 
-    result = graph.run(query, parameters={
+    query_2 = '''
+        MATCH(co:Collection {collection_id: $collection_id}),(c:Chunk {chunk_id: $chunk_id})
+        CREATE (c)-[:CONTAINED_IN]->(co)
+    '''
+
+    parameters_1 = {
         'chunk_id': chunk_id,
         'text': text,
         'source_file': source_file,
@@ -75,15 +79,20 @@ def add_node(text, source_file, start_time, end_time, summaries, entities, simil
         'end_time': end_time,
         'summaries': [],
         'entities': [],
-        'similarity': []
-    }).data()
+        'similarity': [],
+        'collection_id': collection_id
+    }
 
-    result = result[0]['chunk']
-    response['node'] = result
+    parameters_2 = {
+        'chunk_id': chunk_id,
+        'collection_id': collection_id
+    }
+
+    response = submit(query_1, parameters_1)
+    submit(query_2, parameters_2)
     return response
 
-
-def add_unwrap_node(text, source_file):
+def add_unwrap_chunk_to_collection(text, source_file):
     hash = hashlib.md5(text[0].encode("utf-8"))
     chunk_id = hash.hexdigest()
 
