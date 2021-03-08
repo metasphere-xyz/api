@@ -4,7 +4,8 @@ import json
 
 # Custom functions
 from functions import *
-from endpoints.graph.functions import *
+from endpoints.graph.cypher import *
+from endpoints.graph.response import *
 
 graph = Blueprint('graph', __name__)
 
@@ -12,11 +13,7 @@ graph = Blueprint('graph', __name__)
 def return_node():
     # Parse input parameters from request
     if request_type(request) == 'application/json':
-        # parse request values from JSON
-        data_json = request.json
-        json_key=[*data_json][0]
-        search=request.get_json()[json_key]
-
+        search = get_single_json_value()
     else:
         raise_error('json expected')
 
@@ -27,9 +24,7 @@ def return_node():
 
     if response_type(request) == 'application/json':
         try:
-            response = make_response(json.dumps(nodes))
-            response.mimetype = 'application/json'
-            return response
+            return response_json(nodes)
         except Exception as ex:
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
@@ -38,37 +33,28 @@ def return_node():
 @graph.route('/find/chunk', methods=['POST', 'GET'])
 def return_chunk():
     if request_type(request) == 'application/json':
-        data_json = request.json
-        json_key=[*data_json][0]
-        search=request.get_json()[json_key]
+        search = get_single_json_value()
 
     chunk = find_chunk(search)
-
-    response = make_response(json.dumps(chunk))
-    response.mimetype = 'application/json'
-    return response
+    return response_is_json(chunk)
 
 
 @graph.route('/find/chunk/<string:node_id>', methods=['POST','GET'])
 def return_chunk_viaGET(node_id):
-    nodes = find_chunk(node_id)
-
-    response = make_response(json.dumps(nodes))
-    response.mimetype = 'application/json'
-    return response
+    chunk = find_chunk(node_id)
+    return response_is_json(chunk)
 
 
 @graph.route('/find/entity', methods=['POST', 'GET'])
 def return_entity():
-    data_json = request.json
-    json_key=[*data_json][0]
-    search=request.get_json()[json_key]
+    search = get_single_json_value()
+    entity = find_entity(search)
+    return response_is_json(entity)
 
-    nodes = find_chunk(search)
-
-    response = make_response(json.dumps(nodes))
-    response.mimetype = 'application/json'
-    return response
+@graph.route('/find/entity/<string:entity_id>', methods=['POST','GET'])
+def return_entity_viaGET(entity_id):
+    nodes = find_entity(entity_id)
+    return response_is_json(nodes)
 
 
 @graph.route('/add/chunk', methods=['POST', 'GET'])
@@ -93,9 +79,7 @@ def add_chunk():
 
     if response_type(request) == 'application/json':
         try:
-            response = make_response(json.dumps(chunk))
-            response.mimetype = 'application/json'
-            return response
+            return response_json(chunk)
         except Exception as ex:
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
@@ -110,14 +94,11 @@ def add_unwrap_chunk():
     else:
         raise_error('json expected')
 
-
     unwrap_chunk = add_unwrap_node(text, source_file)
 
     if response_type(request) == 'application/json':
         try:
-            response = make_response(json.dumps(unwrap_chunk))
-            response.mimetype = 'application/json'
-            return response
+            return response_json(unwrap_chunk)
         except Exception as ex:
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
@@ -138,9 +119,7 @@ def connect_chunk():
 
     if response_type(request) == 'application/json':
         try:
-            response = make_response(json.dumps(connected_nodes))
-            response.mimetype = 'application/json'
-            return response
+            return response_json(connected_nodes)
         except Exception as ex:
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
@@ -161,14 +140,11 @@ def disconnect_chunk():
 
     if response_type(request) == 'application/json':
         try:
-            response = make_response(json.dumps(disconnected_nodes))
-            response.mimetype = 'application/json'
-            return response
+            return response_json(disconnected_nodes)
         except Exception as ex:
             traceback.print_exc()
             return {'status': 'failed', 'error': str(ex)}
     
-
 
 # TODO: add missing endpoints:
 # /graph/find/chunk

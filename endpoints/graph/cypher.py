@@ -1,55 +1,12 @@
+from endpoints.graph.response import *
 import hashlib
 md5 = hashlib.md5()
-from http import HTTPStatus
 
 from py2neo import Graph
 graph = Graph(
-    # "bolt://127.0.0.1:7687",
     "bolt://ecchr.metasphere.xyz:7687/",
     auth=('neo4j', 'burr-query-duel-cherry')
 )
-
-response = {}
-
-response_connect = {
-    "status": "success",
-    "connected": {},
-    "with": {
-        "node": {
-
-        },
-        "score": 0
-    }
-}
-
-response_disconnect = {
-    "status": "success",
-    "disconnected": {},
-    "from": {
-        "node": {
-
-        },
-        "relation": ""
-    }
-}
-
-def submit(query, parameters):
-    try:
-        result = graph.run(query, parameters).data()
-        result=result[0]['db_return']
-        response['status']='success'
-        response['instance']=result
-        return response
-    except:
-        response['status']='failed'
-        response['message'] = "could not find instance (" + str(404) + ")"
-        response['instance']= parameters
-        return response
-
-# graph functions / cypher commands
-
-# This function find all nodes independent from the Label
-
 
 def find_node(search):
     query = '''
@@ -68,7 +25,6 @@ def find_node(search):
 
 # This function find just the nodes with the Label "Chunk"
 
-
 def find_chunk(chunk):
     query = '''
         MATCH (c:Chunk)
@@ -77,7 +33,18 @@ def find_chunk(chunk):
     '''
 
     parameters={'chunk': chunk}
-    response = submit(query, parameters)
+    response = submit_find(query, parameters)
+    return response
+
+def find_entity(entity):
+    query = '''
+        MATCH (e:Entity)
+        WHERE e.entity_id=$entity or e.name=$entity
+        RETURN e as db_return
+    '''
+
+    parameters={'entity': entity}
+    response = submit_find(query, parameters)
     return response
 
 # TODO: add missing functions for other endpoints
