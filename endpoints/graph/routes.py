@@ -178,8 +178,7 @@ def disconnect_chunk():
 
     disconnected_nodes = disconnect_chunk_from_chunk(
         disconnect, 
-        from_id, 
-        from_relation
+        from_id
         )
     response = response_is_json(disconnected_nodes)
     return response
