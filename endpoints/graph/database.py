@@ -51,7 +51,7 @@ def find_collection(collection):
 def find_summary(summary):
     query = '''
         MATCH (s:Summary)
-        WHERE s.summary_id=$summary or s.name=$summary
+        WHERE s.summary_id=$summary or s.name=$summary or s.text=$summary
         RETURN s as db_return
     '''
     parameters={'summary': summary}
@@ -155,7 +155,7 @@ def add_unwrap_chunk_to_collection(text, source_file, start_time, end_time, summ
 
 def add_entity_to_chunk(chunk_id, name, url, entity_category):
     query = '''
-        CREATE (e:Entity {name: $name, url: $url})
+        CREATE (e:Entity:ORG {name: $name, url: $url})
         SET e:$entity_category
         WITH e
         MATCH (c:Chunk {chunk_id: $chunk_id})

@@ -144,10 +144,8 @@ def add_unwrap_chunk():
         similarity, 
         collection_id
     )
-
     response = response_is_json(unwrap_chunk)
     return response
-
 
 @graph.route('/connect/chunk', methods=['POST', 'GET'])
 def connect_chunk():
@@ -196,10 +194,6 @@ def disconnect_entity():
     
 
 # TODO: add missing endpoints:
-# /graph/find/chunk
-# /graph/find/entity
-# /graph/find/summaries
-# /graph/find/collection
 #
 # /graph/add/chunk ({chunk_id, chunk_text, etc.} (json object))
 # /graph/add/summary (chunk_id, summary (json object))
