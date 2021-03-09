@@ -96,7 +96,6 @@ def summarizer_torch(text, min_length, max_length):
     return summary
 
 def summarize(text, aim, deviation, num_summaries, response_type):
-
     # md5.update(text.encode("utf-8"))
     hash = hashlib.md5(text.encode("utf-8"))
     chunk_id = hash.hexdigest()

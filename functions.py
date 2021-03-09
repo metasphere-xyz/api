@@ -11,6 +11,18 @@ accepted_response_types = (
     'text/html'
 )
 
+def response_is_json(create_response):
+    if response_type(request) == 'application/json':
+        try:
+            response = make_response(json.dumps(create_response))
+            response.mimetype = 'application/json'
+            return response
+        except Exception as ex:
+            traceback.print_exc()
+            return {'status': 'failed', 'error': str(ex)}
+    else:
+        return 'error'
+
 def response_type(request):
     # filter for accepted response types:
     for accepted_response in accepted_response_types:

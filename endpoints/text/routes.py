@@ -5,8 +5,19 @@ import json
 # Custom functions
 from functions import *
 from endpoints.text.functions import *
+from endpoints.text.text_processing import *
+from endpoints.text.request import *
+from endpoints.text.response import *
+
 
 text = Blueprint('text', __name__)
+
+@text.route('/extract/entities', methods=['POST', 'GET'])
+def return_ner():
+    text = get_text_json()
+    ner_output = ner(text)
+    response = response_is_json(ner_output)
+    return response
 
 @text.route('/summarize', methods=['POST', 'GET'])
 def return_summaries():
