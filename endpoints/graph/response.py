@@ -25,7 +25,7 @@ response_connect = {
         "node": {
 
         },
-        "score": 0
+        "score": 50
     }
 }
 
@@ -39,50 +39,6 @@ response_disconnect = {
         "relation": ""
     }
 }
-
-def get_single_json_value():
-    if request_type(request) == 'application/json':
-        data_json = request.json
-        json_key=[*data_json][0]
-        search=request.get_json()[json_key]
-        return search
-    else:
-        return 'json expected'
-
-def get_chunk_json_value():
-    if request_type(request) == 'application/json':
-        text = request.get_json()['text']
-        source_file = request.get_json()['source_file']
-        start_time = request.get_json()['start_time']
-        end_time = request.get_json()['end_time']
-        summaries = request.get_json()['summaries']
-        entities = request.get_json()['entities']
-        similarity = request.get_json()['similarity']
-        collection_id = request.get_json()['collection_id']
-        return text, source_file, start_time, end_time, summaries, entities, similarity, collection_id
-    else:
-        return 'json expected'
-
-def get_collection_json_value():
-    if request_type(request) == 'application/json':
-        name = request.get_json()['name']
-        source_type = request.get_json()['source_type']
-        source_path = request.get_json()['source_path']
-        date = request.get_json()['date']
-        chunk_sequence = request.get_json()['chunk_sequence']
-        return name, source_type, source_path, date, chunk_sequence
-    else:
-        return 'json expected'
-
-def get_entity_json_value():
-    if request_type(request) == 'application/json':
-        chunk_id = request.get_json()['chunk_id']
-        name = request.get_json()['name']
-        url = request.get_json()['url']
-        entity_category = request.get_json()['entity_category']
-        return chunk_id, name, url, entity_category
-    else:
-        return 'json expected'
 
 def response_is_json(graph_return):
     if response_type(request) == 'application/json':
@@ -107,3 +63,62 @@ def submit(query, parameters):
         response_failed['message'] = "could not find instance (" + str(404) + ")"
         response_failed['instance']= parameters
         return response_failed
+
+def connect_chunk_to_chunk_submit(query, parameters):
+    try:
+        result = graph.run(query, parameters).data()
+        start_chunk = result[0]['n1']
+        end_chunk = result[0]['n2']
+        similarity = result[0]['similarity']
+        response_connect['connected'] = start_chunk
+        response_connect['with']['node'] = end_chunk
+        response_connect['with']['score'] = similarity
+        return response_connect
+    except:
+        traceback.print_exc()
+        response_failed['message'] = "could not create connection (" + str(404) + ")"
+        response_failed['instance']= parameters
+        return response_failed
+
+def connect_entity_to_chunk_submit(query, parameters):
+    try:
+        result = graph.run(query, parameters).data()
+        entity = result[0]['e']
+        chunk = result[0]['c']
+        response_connect['connected'] = entity
+        response_connect['with']['node'] = chunk
+        return response_connect
+    except:
+        traceback.print_exc()
+        response_failed['message'] = "could not create connection (" + str(404) + ")"
+        response_failed['instance']= parameters
+        return response_failed
+
+def disconnect_chunk_from_chunk_submit(query, parameters):
+    try:
+        result = graph.run(query, parameters).data()
+        chunk = result[0]['c']
+        collection = result[0]['co']
+        response_disconnect['disconnected'] = chunk
+        response_disconnect['from']['node'] = collection
+        return response_disconnect
+    except:
+        traceback.print_exc()
+        response_failed['message'] = "could not create connection (" + str(404) + ")"
+        response_failed['instance']= parameters
+        return response_failed
+
+def disconnect_entity_from_chunk_submit(query, parameters):
+    try:
+        result = graph.run(query, parameters).data()
+        entity = result[0]['e']
+        chunk = result[0]['c']
+        response_disconnect['disconnected'] = entity
+        response_disconnect['from']['node'] = chunk
+        return response_disconnect
+    except:
+        traceback.print_exc()
+        response_failed['message'] = "could not create connection (" + str(404) + ")"
+        response_failed['instance']= parameters
+        return response_failed
+

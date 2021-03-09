@@ -156,7 +156,7 @@ def add_unwrap_chunk_to_collection(text, source_file, start_time, end_time, summ
 def add_entity_to_chunk(chunk_id, name, url, entity_category):
     query = '''
         CREATE (e:Entity {name: $name, url: $url})
-        SET e: $entity_category
+        SET e:$entity_category
         WITH e
         MATCH (c:Chunk {chunk_id: $chunk_id})
         CREATE (c)-[:MENTIONS]->(e)
@@ -171,46 +171,75 @@ def add_entity_to_chunk(chunk_id, name, url, entity_category):
     response = submit(query, parameters)
     return response
 
-def connect_nodes(connect, with_id, with_score):
+def add_summary_to_chunk(chunk_id, summary_id, text, compression, aim, deviation):
     query = '''
-        MATCH(n1 {chunk_id:$start_id}),(n2 {chunk_id:$end_id})
-        CREATE (n1)-[:SIMILARITY {similarity:$similarity}]->(n2)
-        RETURN n1, n2
+        CREATE (s:Summary {summary_id: $summary_id, text: $text, compression: $compression, aim: $aim, deviation: $deviation})
+        WITH s
+        MATCH (c:Chunk {chunk_id: $chunk_id})
+        CREATE (s)-[:BELONGS_TO]->(c)
+        RETURN s as db_return
     '''
+    parameters = {
+        'chunk_id': chunk_id,
+        'summary_id': summary_id,
+        'text': text,
+        'compression': compression,
+        'aim': aim,
+        'deviation': deviation
+    }
+    response = submit(query, parameters)
+    return response
 
-    result = graph.run(query, parameters={
+def connect_chunk_to_chunk(connect, with_id, with_score):
+    query = '''
+        MATCH(n1 {chunk_id: $start_id}),(n2 {chunk_id: $end_id})
+        CREATE (n1)-[w:SIMILARITY {similarity: $similarity}]->(n2)
+        RETURN n1, n2, w.similarity as similarity
+    '''
+    parameters={
         'start_id': connect,
         'end_id': with_id,
         'similarity': with_score
-    }).data()
+    }
 
-    start_chunk = result[0]['n1']
-    end_chunk = result[0]['n2']
+    response = connect_chunk_to_chunk_submit(query, parameters)
+    return response
 
-    response_connect['connected'] = start_chunk
-    response_connect['with']['node'] = end_chunk
-    response_connect['with']['score'] = with_score
+def connect_entity_to_chunk(connect, with_id):
+    query = '''
+        MATCH(e {entity_id: $entity_id}),(c {chunk_id: $chunk_id})
+        CREATE (e)<-[w:MENTIONS]-(c)
+        RETURN c, e
+    '''
+    parameters={
+        'entity_id': connect,
+        'chunk_id': with_id
+    }
+    response = connect_entity_to_chunk_submit(query, parameters)
+    return response
 
-    return response_connect
-
-
-def disconnect_nodes(disconnect, from_id, from_relation):
+def disconnect_chunk_from_chunk(disconnect, from_id):
     query = '''
         MATCH (c:Chunk {chunk_id: $chunk_id})-[r:CONTAINED_IN]->(co:Collection {collection_id: $collection_id})
         DELETE r
         RETURN c, co, r
     '''
-
-    result = graph.run(query, parameters={
+    parameters = {
         'chunk_id': disconnect,
         'collection_id': from_id
-    }).data()
-
-    chunk = result[0]['c']
-    collection = result[0]['co']
-
-    response_disconnect['disconnected'] = chunk
-    response_disconnect['from']['node'] = collection
-    response_disconnect['from']['relation'] = from_relation
-
-    return response_disconnect
+    }
+    response = disconnect_chunk_from_chunk_submit(query, parameters)
+    return response
+    
+def disconnect_entity_from_chunk(disconnect, from_id):
+    query = '''
+        MATCH (c:Chunk {chunk_id: $chunk_id})-[r:MENTIONS]->(e:Entity {entity_id: $entity_id})
+        DELETE r
+        RETURN e, c, r
+    '''
+    parameters = {
+        'entity_id': disconnect,
+        'chunk_id': from_id
+    }
+    response = disconnect_entity_from_chunk_submit(query, parameters)
+    return response
