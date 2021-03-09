@@ -70,6 +70,20 @@ def return_summary_viaGET(summary_id):
     response = response_is_json(summary)
     return response
 
+@graph.route('/add/collection', methods=['POST', 'GET'])
+def add_collection():
+    name, source_type, source_path, date, chunk_sequence = get_collection_json_value()
+
+    collection = add_collection_without_connections(
+        name,
+        source_type,
+        source_path,
+        date,
+        chunk_sequence
+        )
+    response = response_is_json(collection)
+    return response
+
 @graph.route('/add/chunk', methods=['POST', 'GET'])
 def add_chunk():
     text, source_file, start_time, end_time, summaries, entities, similarity, collection_id = get_chunk_json_value()
@@ -85,6 +99,20 @@ def add_chunk():
         collection_id
         )
     response = response_is_json(chunk)
+    return response
+
+@graph.route('/add/entity', methods=['POST', 'GET'])
+def add_entity():
+    chunk_id, name, url, entity_category = get_entity_json_value()
+    print(entity_category)
+
+    entity = add_entity_to_chunk(
+        chunk_id,
+        name,
+        url,
+        entity_category
+        )
+    response = response_is_json(entity)
     return response
 
 @graph.route('/unwrap/chunk', methods=['POST', 'GET'])
