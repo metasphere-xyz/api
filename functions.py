@@ -1,15 +1,3 @@
-# Helper functions
-import json
-
-# Helper functions for dealing with requests:
-
-# response_type(request):
-# returns accepted response type as String
-accepted_response_types = (
-    'application/json',
-    'text/plain',
-    'text/html'
-)
 
 def response_is_json(create_response):
     if response_type(request) == 'application/json':
@@ -23,6 +11,7 @@ def response_is_json(create_response):
     else:
         return 'error'
 
+
 def response_type(request):
     # filter for accepted response types:
     for accepted_response in accepted_response_types:
@@ -32,13 +21,6 @@ def response_type(request):
         else:
             return raise_error("unsupported response type", request)
 
-# request_type(request):
-# returns accepted request type as String
-accepted_request_types = (
-    'application/json',
-    'text/plain',
-    'text/html'
-)
 
 def request_type(request):
     # filter for accepted request types:

@@ -1,12 +1,3 @@
-from endpoints.graph.response import *
-import hashlib
-md5 = hashlib.md5()
-
-from py2neo import Graph
-graph = Graph(
-    "bolt://ecchr.metasphere.xyz:7687/",
-    auth=('neo4j', 'burr-query-duel-cherry')
-)
 
 def find_node(search):
     query = '''
@@ -230,7 +221,7 @@ def disconnect_chunk_from_chunk(disconnect, from_id):
     }
     response = disconnect_chunk_from_chunk_submit(query, parameters)
     return response
-    
+
 def disconnect_entity_from_chunk(disconnect, from_id):
     query = '''
         MATCH (c:Chunk {chunk_id: $chunk_id})-[r:MENTIONS]->(e:Entity {entity_id: $entity_id})

@@ -1,5 +1,4 @@
-from flask import *
-import traceback
+from config import *
 from functions import *
 
 # Configuration

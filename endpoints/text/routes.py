@@ -19,7 +19,7 @@ def return_ner():
     response = response_is_json(ner_output)
     return response
 
-@text.route('/similarity', methods=['POST', 'GET'])
+@text.route('/similarities', methods=['POST', 'GET'])
 def return_similarities():
     text, num_similar_chunks = parse_json('similarity')
     similar_chunks = similarity_tf(text, num_similar_chunks)

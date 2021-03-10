@@ -4,20 +4,30 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 
+# API and requests
+from flask import make_response, request
+from flask import *
+
+import json
+import traceback
+
+# calculations
 import math
 import hashlib
 md5 = hashlib.md5()
+from sklearn.metrics.pairwise import cosine_similarity
+from fuzzy_match import algorithims as algorithms
 
+# nlp libraries
+import spacy
+
+# maschine learning models and pipeplines
 import torch
 from transformers import pipeline
 # from transformers import T5Tokenizer, T5ForConditionalGeneration, T5Config
 from transformers import AutoModel, AutoModelForSeq2SeqLM, AutoTokenizer
 
 import tensorflow_hub as hub
-from sklearn.metrics.pairwise import cosine_similarity
-
-from fuzzy_match import algorithims as algorithms
-import spacy
 
 
 # %% DATABASE
@@ -25,6 +35,21 @@ from py2neo import Graph
 graph = Graph(
     "bolt://ecchr.metasphere.xyz:7687/",
     auth=('neo4j', 'burr-query-duel-cherry')
+)
+
+
+# Accepted Request content types
+accepted_request_types = (
+    'application/json',
+    'text/plain',
+    'text/html'
+)
+
+# Accepted Response accept_mimetypes
+accepted_response_types = (
+    'application/json',
+    'text/plain',
+    'text/html'
 )
 
 # %% GENERAL NLP
