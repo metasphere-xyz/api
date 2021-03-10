@@ -1,32 +1,27 @@
-from flask import *
-from flask import Blueprint
-import json
-
 # Custom functions
-from config import *
-from functions import *
 from endpoints.text.functions import *
 from endpoints.text.text_processing import *
 from endpoints.text.request import *
 from endpoints.text.response import *
 
-text = Blueprint('text', __name__)
+from flask import Blueprint
+text_routes = Blueprint('text', __name__)
 
-@text.route('/extract/entities', methods=['POST', 'GET'])
+@text_routes.route('/extract/entities', methods=['POST', 'GET'])
 def return_ner():
     text = parse_json('text')
     ner_output = ner(text)
     response = response_is_json(ner_output)
     return response
 
-@text.route('/similarities', methods=['POST', 'GET'])
+@text_routes.route('/similarities', methods=['POST', 'GET'])
 def return_similarities():
     text, num_similar_chunks = parse_json('similarity')
     similar_chunks = similarity_tf(text, num_similar_chunks)
     response = response_is_json(similar_chunks)
     return response
 
-@text.route('/summarize', methods=['POST', 'GET'])
+@text_routes.route('/summarize', methods=['POST', 'GET'])
 def return_summaries():
     if request_type(request) == 'text/plain':
         text = request

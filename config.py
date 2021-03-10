@@ -2,41 +2,12 @@
 
 # %% modules
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 
 # API and requests
-from flask import make_response, request
 from flask import *
-
 import json
 import traceback
-
-# calculations
-import math
-import hashlib
-md5 = hashlib.md5()
-from sklearn.metrics.pairwise import cosine_similarity
-from fuzzy_match import algorithims as algorithms
-
-# nlp libraries
-import spacy
-
-# maschine learning models and pipeplines
-import torch
-from transformers import pipeline
-# from transformers import T5Tokenizer, T5ForConditionalGeneration, T5Config
-from transformers import AutoModel, AutoModelForSeq2SeqLM, AutoTokenizer
-
-import tensorflow_hub as hub
-
-
-# %% DATABASE
-from py2neo import Graph
-graph = Graph(
-    "bolt://ecchr.metasphere.xyz:7687/",
-    auth=('neo4j', 'burr-query-duel-cherry')
-)
-
+from http import HTTPStatus
 
 # Accepted Request content types
 accepted_request_types = (
@@ -51,6 +22,32 @@ accepted_response_types = (
     'text/plain',
     'text/html'
 )
+
+# calculations
+import math
+import hashlib
+md5 = hashlib.md5()
+from sklearn.metrics.pairwise import cosine_similarity
+from fuzzy_match import algorithims as algorithms
+
+# nlp libraries
+import spacy
+
+# maschine learning models and pipeplines
+import torch
+from transformers import pipeline, AutoModel, AutoModelForSeq2SeqLM, AutoTokenizer
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
+# from transformers import pipeline, T5Tokenizer, T5ForConditionalGeneration, T5Config
+
+
+# %% DATABASE
+from py2neo import Graph
+graph = Graph(
+    "bolt://ecchr.metasphere.xyz:7687/",
+    auth=('neo4j', 'burr-query-duel-cherry')
+)
+
+
 
 # %% GENERAL NLP
 text = ""
@@ -68,9 +65,9 @@ aim = "50"
 deviation = "10"
 num_summaries = "1"
 
-# summarization_model = "facebook/bart-base"
+summarization_model = "facebook/bart-base"
 # summarization_model = "facebook/bart-large-cnn"
-summarization_model = "t5-small"
+# summarization_model = "t5-small"
 # summarization_model = "t5-base"
 # summarization_model = "t5-large"
 # summarization_model = "gpt2"
@@ -101,7 +98,8 @@ summarization_model_parameters = {
 
 # %% SIMILARITY /text/similarities
 num_similar_chunks = "3"
-model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
+# import tensorflow_hub as hub
+# model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
 # model = hub.load("/Users/malte/Desktop/universal-sentence-encoder_4")
 # model = hub.load("models/universal-sentence-encoder_4")
 

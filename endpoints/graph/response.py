@@ -1,15 +1,3 @@
-from flask import make_response, request
-import traceback
-import json
-from functions import *
-from http import HTTPStatus
-from py2neo import Graph
-
-graph = Graph(
-    "bolt://ecchr.metasphere.xyz:7687/",
-    auth=('neo4j', 'burr-query-duel-cherry')
-)
-
 response_success = {
     "status": "success",
 }
@@ -51,7 +39,7 @@ def response_is_json(graph_return):
             return {'status': 'failed', 'error': str(ex)}
     else:
         return 'error'
- 
+
 def submit(query, parameters):
     try:
         result = graph.run(query, parameters).data()
