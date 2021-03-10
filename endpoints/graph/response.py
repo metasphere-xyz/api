@@ -16,7 +16,7 @@ response_connect = {
         "node": {
 
         },
-        "score": 50
+        "score": default_edge_weigth
     }
 }
 
