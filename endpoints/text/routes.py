@@ -21,9 +21,9 @@ def return_ner():
 
 @text.route('/similarity', methods=['POST', 'GET'])
 def return_similarities():
-    text, similarities = get_chunk_json()
-    similarity = similarity_tf(text, similarities)
-    response = response_is_json(similarity)
+    text, num_similar_chunks = parse_json_similarity()
+    similar_chunks = similarity_tf(text, num_similar_chunks)
+    response = response_is_json(similar_chunks)
     return response
 
 @text.route('/summarize', methods=['POST', 'GET'])
