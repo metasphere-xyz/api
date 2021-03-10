@@ -9,7 +9,8 @@ from fuzzy_match import algorithims
 # load nlp modules
 nlp = spacy.load("en_core_web_sm")
 ner_huggingface_pipeline = pipeline("ner")
-model = hub.load("/Users/malte/Desktop/universal-sentence-encoder_4")
+model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
+# model = hub.load("/Users/malte/Desktop/universal-sentence-encoder_4")
 
 
 # %% NER SpaCy
@@ -56,7 +57,7 @@ def similarity_tf(similarity_text, similarities):
 
         ]
     }
-    
+
     for i in range(similarities):
         chunk_text = documents[sorted_scores_indexes[i][1]]
         score = int(round(sorted_scores_indexes[i][0],2)*100)
