@@ -1,4 +1,5 @@
 from config import *
+from flask import make_response
 
 response_success = {
     "status": "success",
@@ -30,17 +31,17 @@ response_disconnect = {
     }
 }
 
-def response_is_json(graph_return):
-    if response_type(request) == 'application/json':
-        try:
-            response = make_response(json.dumps(graph_return))
-            response.mimetype = 'application/json'
-            return response
-        except Exception as ex:
-            traceback.print_exc()
-            return {'status': 'failed', 'error': str(ex)}
-    else:
-        return 'error'
+# def response_is_json(graph_return):
+#     if response_type(request) == 'application/json':
+#         try:
+#             response = make_response(json.dumps(graph_return))
+#             response.mimetype = 'application/json'
+#             return response
+#         except Exception as ex:
+#             traceback.print_exc()
+#             return {'status': 'failed', 'error': str(ex)}
+#     else:
+#         return 'error'
 
 def submit(query, parameters):
     try:
@@ -50,7 +51,7 @@ def submit(query, parameters):
         return response_success
     except:
         traceback.print_exc()
-        response_failed['message'] = "could not find instance (" + str(404) + ")"
+        response_failed['message'] = "could not find instance"
         response_failed['instance']= parameters
         return response_failed
 

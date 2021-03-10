@@ -8,7 +8,6 @@ import os
 # API and requests
 from flask import *
 import json
-import traceback
 from http import HTTPStatus
 
 # calculations

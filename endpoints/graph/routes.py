@@ -1,5 +1,6 @@
 # Custom functions
 from config import *
+from functions import *
 
 from endpoints.graph.database import *
 from endpoints.graph.response import *
@@ -14,59 +15,59 @@ def return_node():
     # if not chunk_id:
     #     raise_error('no id specified')
     nodes = find_node(search)
-    response = response_is_json(nodes)
+    response = respond_with_json(nodes)
     return response
 
 @graph_routes.route('/find/chunk', methods=['POST', 'GET'])
 def return_chunk():
     search = get_single_json_value()
     chunk = find_chunk(search)
-    response = response_is_json(chunk)
+    response = respond_with_json(chunk)
     return response
 
 @graph_routes.route('/find/chunk/<string:node_id>', methods=['POST','GET'])
 def return_chunk_viaGET(node_id):
     chunk = find_chunk(node_id)
-    response = response_is_json(chunk)
+    response = respond_with_json(chunk)
     return response
 
 @graph_routes.route('/find/entity', methods=['POST', 'GET'])
 def return_entity():
     search = get_single_json_value()
     entity = find_entity(search)
-    response = response_is_json(entity)
+    response = respond_with_json(entity)
     return response
 
 @graph_routes.route('/find/entity/<string:entity_id>', methods=['POST','GET'])
 def return_entity_viaGET(entity_id):
     entity = find_entity(entity_id)
-    response = response_is_json(entity)
+    response = respond_with_json(entity)
     return response
 
 @graph_routes.route('/find/collection', methods=['POST', 'GET'])
 def return_collection():
     search = get_single_json_value()
     collection = find_collection(search)
-    response = response_is_json(collection)
+    response = respond_with_json(collection)
     return response
 
 @graph_routes.route('/find/collection/<string:collection_id>', methods=['POST','GET'])
 def return_collection_viaGET(collection_id):
     collection = find_collection(collection_id)
-    response = response_is_json(collection)
+    response = respond_with_json(collection)
     return response
 
 @graph_routes.route('/find/summary', methods=['POST', 'GET'])
 def return_summary():
     search = get_single_json_value()
     summary = find_summary(search)
-    response = response_is_json(summary)
+    response = respond_with_json(summary)
     return response
 
 @graph_routes.route('/find/summary/<string:summary_id>', methods=['POST','GET'])
 def return_summary_viaGET(summary_id):
     summary = find_summary(summary_id)
-    response = response_is_json(summary)
+    response = respond_with_json(summary)
     return response
 
 @graph_routes.route('/add/collection', methods=['POST', 'GET'])
@@ -80,7 +81,7 @@ def add_collection():
         date,
         chunk_sequence
         )
-    response = response_is_json(collection)
+    response = respond_with_json(collection)
     return response
 
 @graph_routes.route('/add/chunk', methods=['POST', 'GET'])
@@ -97,7 +98,7 @@ def add_chunk():
         similarity,
         collection_id
         )
-    response = response_is_json(chunk)
+    response = respond_with_json(chunk)
     return response
 
 @graph_routes.route('/add/entity', methods=['POST', 'GET'])
@@ -110,7 +111,7 @@ def add_entity():
         url,
         entity_category
         )
-    response = response_is_json(entity)
+    response = respond_with_json(entity)
     return response
 
 @graph_routes.route('/add/summary', methods=['POST', 'GET'])
@@ -125,7 +126,7 @@ def add_summary():
         aim,
         deviation
         )
-    response = response_is_json(summary)
+    response = respond_with_json(summary)
     return response
 
 @graph_routes.route('/unwrap/chunk', methods=['POST', 'GET'])
@@ -142,7 +143,7 @@ def add_unwrap_chunk():
         similarity,
         collection_id
     )
-    response = response_is_json(unwrap_chunk)
+    response = respond_with_json(unwrap_chunk)
     return response
 
 @graph_routes.route('/connect/chunk', methods=['POST', 'GET'])
@@ -154,7 +155,7 @@ def connect_chunk():
         with_id,
         with_score
     )
-    response = response_is_json(connected_nodes)
+    response = respond_with_json(connected_nodes)
     return response
 
 @graph_routes.route('/connect/entity', methods=['POST', 'GET'])
@@ -165,7 +166,7 @@ def connect_entity():
         connect,
         with_id
     )
-    response = response_is_json(connected_nodes)
+    response = respond_with_json(connected_nodes)
     return response
 
 @graph_routes.route('/disconnect/chunk', methods=['POST', 'GET'])
@@ -176,7 +177,7 @@ def disconnect_chunk():
         disconnect,
         from_id
         )
-    response = response_is_json(disconnected_nodes)
+    response = respond_with_json(disconnected_nodes)
     return response
 
 @graph_routes.route('/disconnect/entity', methods=['POST', 'GET'])
@@ -187,7 +188,7 @@ def disconnect_entity():
         disconnect,
         from_id
         )
-    response = response_is_json(disconnected_nodes)
+    response = respond_with_json(disconnected_nodes)
     return response
 
 

@@ -2,7 +2,6 @@
 from config import *
 
 from endpoints.text.functions import *
-from endpoints.text.text_processing import *
 from endpoints.text.request import *
 from endpoints.text.response import *
 
@@ -13,14 +12,14 @@ text_routes = Blueprint('text', __name__)
 def return_ner():
     text = parse_json('text')
     ner_output = ner(text)
-    response = response_is_json(ner_output)
+    response = respond_with_json(ner_output)
     return response
 
 @text_routes.route('/similarities', methods=['POST', 'GET'])
 def return_similarities():
     text, num_similar_chunks = parse_json('similarity')
     similar_chunks = similarity_tf(text, num_similar_chunks)
-    response = response_is_json(similar_chunks)
+    response = respond_with_json(similar_chunks)
     return response
 
 @text_routes.route('/summarize', methods=['POST', 'GET'])
