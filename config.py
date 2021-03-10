@@ -90,3 +90,5 @@ num_similar_chunks = "3"
 # model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
 # model = hub.load("/Users/malte/Desktop/universal-sentence-encoder_4")
 model = hub.load("models/universal-sentence-encoder_4")
+default_edge_weigth = "50"
+
