@@ -1,6 +1,4 @@
-from flask import *
-import traceback
-from functions import *
+from config import *
 
 # Configuration
 api = Flask(__name__)
@@ -24,15 +22,15 @@ def welcome():
 
 # Endpoints
 # /text/
-from endpoints.text.routes import text
-api.register_blueprint(text, url_prefix='/text')
+from endpoints.text.routes import text_routes
+api.register_blueprint(text_routes, url_prefix='/text')
 
 # /graph
-from endpoints.graph.routes import graph
-api.register_blueprint(graph, url_prefix='/graph')
+from endpoints.graph.routes import graph_routes
+api.register_blueprint(graph_routes, url_prefix='/graph')
 
 # TODO: add other endpoints
 
 # Run API
 if __name__ == '__main__':
-    api.run()
+    api.run(use_reloader=False)

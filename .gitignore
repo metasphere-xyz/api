@@ -11,6 +11,9 @@ venv/
 env.bak/
 venv.bak/
 
+# ML Models
+models/
+
 # Byte-compiled
 __pycache__/
 *.py[cod]

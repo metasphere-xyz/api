@@ -1,15 +1,31 @@
-# Helper functions
+from config import *
 import json
+import traceback
+from flask import make_response
 
-# Helper functions for dealing with requests:
+# Accepted Request content types
+accepted_request_types = (
+    'application/json',
+    'text/plain',
+    'text/html'
+)
 
-# response_type(request):
-# returns accepted response type as String
+# Accepted Response accept_mimetypes
 accepted_response_types = (
     'application/json',
     'text/plain',
     'text/html'
 )
+
+def respond_with_json(payload):
+    try:
+        response = make_response(json.dumps(payload))
+        response.mimetype = 'application/json'
+        return response
+    except Exception as ex:
+        traceback.print_exc()
+        return {'status': 'failed', 'error': str(ex)}
+
 
 def response_type(request):
     # filter for accepted response types:
@@ -20,13 +36,6 @@ def response_type(request):
         else:
             return raise_error("unsupported response type", request)
 
-# request_type(request):
-# returns accepted request type as String
-accepted_request_types = (
-    'application/json',
-    'text/plain',
-    'text/html'
-)
 
 def request_type(request):
     # filter for accepted request types:
