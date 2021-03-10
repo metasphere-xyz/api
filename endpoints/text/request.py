@@ -14,10 +14,9 @@ def parse_json(endpoint):
                 raise_error("no text specified")
             return text, num_chunks, similarity_score_treshold
         elif endpoint == 'text':
-            text = request.get_json()['text']
-            if not text:
+            if not request.get_json()['text']:
                 raise_error("no text specified")
-            return text
+            return request.get_json()['text']
         elif endpoint == 'summarize':
             text = request.get_json()["text"]
             aim = request.get_json()["aim"]
