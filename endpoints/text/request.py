@@ -7,10 +7,12 @@ def parse_json(endpoint):
         if endpoint == 'similarity':
             text = request.get_json()['text']
             num_chunks = request.get_json()['chunks']
+            if int(request.get_json()['minimum_score']) > 0:
+                similarity_score_treshold = str(request.get_json()['minimum_score'])
             # define standard values
             if not text:
                 raise_error("no text specified")
-            return text, num_chunks
+            return text, num_chunks, similarity_score_treshold
         elif endpoint == 'text':
             text = request.get_json()['text']
             if not text:
