@@ -10,10 +10,12 @@ def get_text_json():
     else:
         return 'json expected'
 
-def get_chunk_json():
+def parse_json_similarity():
     if request_type(request) == 'application/json':
         text = request.get_json()['text']
-        similarities = request.get_json()['similarities']
-        return text, similarities
+        num_chunks = request.get_json()['chunks']
+        if not num_chunks:
+            num_chunks = 3
+        return text, num_chunks
     else:
         return 'json expected'
