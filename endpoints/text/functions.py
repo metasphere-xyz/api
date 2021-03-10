@@ -121,6 +121,10 @@ def ner_huggingface(text):
 
 #%% Text Similarity
 def similarity_tf(similarity_text, num_similar_chunks):
+    # model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
+    # model = hub.load("/Users/malte/Desktop/universal-sentence-encoder_4")
+    model = hub.load("models/universal-sentence-encoder_4")
+
     # TODO: add filter for type (chunk, summary, entity)
     query = '''
         MATCH (c:Chunk)
@@ -134,7 +138,6 @@ def similarity_tf(similarity_text, num_similar_chunks):
     for chunks in result:
         documents.append(chunks['c.text'])
         chunk_list.append(chunks['c.chunk_id'])
-
 
     base_embeddings = model([similarity_text])
     embeddings = model(documents)
@@ -157,12 +160,13 @@ def similarity_tf(similarity_text, num_similar_chunks):
         chunk_id = chunk_list[index]
         chunk_text = documents[index]
         score = int(round(sorted_scores_indexes[i][0],2)*100)
-        response_similarity['similarity'].append(
-            {
-                "chunk_id": chunk_id,
-                "score": score,
-                "text": chunk_text
-            }
-        )
+        if 100 > score >= int(similarity_score_treshold):
+            response_similarity['similarity'].append(
+                {
+                    "chunk_id": chunk_id,
+                    "score": score,
+                    "text": chunk_text
+                }
+            )
     return response_similarity
 # %%
