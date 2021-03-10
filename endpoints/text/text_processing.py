@@ -15,6 +15,7 @@ nlp = spacy.load("en_core_web_sm")
 ner_huggingface_pipeline = pipeline("ner")
 model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
 # model = hub.load("/Users/malte/Desktop/universal-sentence-encoder_4")
+# model = hub.load("models/universal-sentence-encoder_4")
 
 
 # %% NER SpaCy
@@ -37,10 +38,10 @@ def ner_huggingface(text):
     return ner_huggingface_processed
 
 #%% Text Similarity
-def similarity_tf(similarity_text, similarities):
+def similarity_tf(similarity_text, num_similar_chunks):
     query = '''
         MATCH (c:Chunk)
-        RETURN c.chunk_id, c.text 
+        RETURN c.chunk_id, c.text
     '''
     result = graph.run(query).data()
 
@@ -69,7 +70,7 @@ def similarity_tf(similarity_text, similarities):
         ]
     }
 
-    for i in range(similarities):
+    for i in range(num_similar_chunks):
         index = sorted_scores_indexes[i][1]
         chunk_id = chunk_list[index]
         chunk_text = documents[index]
