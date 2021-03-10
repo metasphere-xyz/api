@@ -103,8 +103,11 @@ def summarize(text, aim, deviation, num_summaries, response_type):
 # %% NER SpaCy
 def ner(text):
     doc = nlp(text)
+    hash = hashlib.md5(text.encode("utf-8"))
+    chunk_id = hash.hexdigest()
+
     ner_proccessed = {
-        "chunk_id": "md5",
+        "chunk_id": chunk_id,
         "entities": {
 
         }
@@ -121,6 +124,9 @@ def ner_huggingface(text):
 
 #%% Text Similarity
 def similarity_tf(similarity_text, num_similar_chunks, similarity_score_treshold):
+    # TODO: port to huggingface:
+    # https://huggingface.co/sentence-transformers/bert-base-nli-cls-token
+    #
     # model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
     # model = hub.load("/Users/malte/Desktop/universal-sentence-encoder_4")
     model = hub.load("models/universal-sentence-encoder_4")
@@ -147,8 +153,11 @@ def similarity_tf(similarity_text, num_similar_chunks, similarity_score_treshold
     sorted_scores_indexes = sorted(((value, index) for index, value in enumerate(scores)), reverse=True)
     print(sorted_scores_indexes)
 
+    hash = hashlib.md5(text.encode("utf-8"))
+    chunk_id = hash.hexdigest()
+
     response_similarity = {
-        "chunk_id": "md5",
+        "chunk_id": chunk_id,
         "text": similarity_text,
         "similarity": [
 
