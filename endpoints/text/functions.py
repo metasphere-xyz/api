@@ -103,8 +103,11 @@ def summarize(text, aim, deviation, num_summaries, response_type):
 # %% NER SpaCy
 def ner(text):
     doc = nlp(text)
+    hash = hashlib.md5(text.encode("utf-8"))
+    chunk_id = hash.hexdigest()
+
     ner_proccessed = {
-        "chunk_id": "md5",
+        "chunk_id": chunk_id,
         "entities": {
 
         }
@@ -148,7 +151,6 @@ def similarity_tf(similarity_text, num_similar_chunks, similarity_score_treshold
     print(sorted_scores_indexes)
 
     response_similarity = {
-        "chunk_id": "md5",
         "text": similarity_text,
         "similarity": [
 
