@@ -53,11 +53,11 @@ ner_huggingface_pipeline = pipeline("ner")
 
 aim = "50"
 deviation = "10"
-num_summaries = "1"
+num_summaries = "3"
 
-summarization_model = "facebook/bart-base"
+# summarization_model = "facebook/bart-base"
 # summarization_model = "facebook/bart-large-cnn"
-# summarization_model = "t5-small"
+summarization_model = "t5-small"
 # summarization_model = "t5-base"
 # summarization_model = "t5-large"
 # summarization_model = "gpt2"
