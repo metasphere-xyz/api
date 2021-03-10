@@ -1,3 +1,18 @@
+from config import *
+
+# Accepted Request content types
+accepted_request_types = (
+    'application/json',
+    'text/plain',
+    'text/html'
+)
+
+# Accepted Response accept_mimetypes
+accepted_response_types = (
+    'application/json',
+    'text/plain',
+    'text/html'
+)
 
 def response_is_json(create_response):
     if response_type(request) == 'application/json':

@@ -1,3 +1,4 @@
+from config import *
 
 def find_node(search):
     query = '''

@@ -1,4 +1,6 @@
 # Custom functions
+from config import *
+
 from endpoints.graph.database import *
 from endpoints.graph.response import *
 from endpoints.graph.request import *

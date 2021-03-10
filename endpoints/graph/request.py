@@ -1,7 +1,4 @@
-from flask import make_response, request
-import traceback
-import json
-from functions import *
+from config import *
 
 def get_single_json_value():
     if request_type(request) == 'application/json':

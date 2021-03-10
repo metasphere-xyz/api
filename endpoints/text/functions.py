@@ -1,3 +1,4 @@
+from config import *
 
 def preprocess(text):
     return text.replace("\r", "\n ").replace("\n", " ").replace("\s\s+", " ").strip()

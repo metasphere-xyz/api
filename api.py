@@ -1,5 +1,4 @@
 from config import *
-from functions import *
 
 # Configuration
 api = Flask(__name__)
@@ -34,4 +33,4 @@ api.register_blueprint(graph_routes, url_prefix='/graph')
 
 # Run API
 if __name__ == '__main__':
-    api.run()
+    api.run(use_reloader=False)

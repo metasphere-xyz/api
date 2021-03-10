@@ -1,3 +1,4 @@
+from config import *
 
 def parse_json(endpoint):
     if request_type(request) != 'application/json':

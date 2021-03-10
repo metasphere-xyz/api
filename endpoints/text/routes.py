@@ -1,4 +1,6 @@
 # Custom functions
+from config import *
+
 from endpoints.text.functions import *
 from endpoints.text.text_processing import *
 from endpoints.text.request import *

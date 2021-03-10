@@ -1,3 +1,5 @@
+from config import *
+
 response_success = {
     "status": "success",
 }

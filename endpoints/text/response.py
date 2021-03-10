@@ -1,3 +1,4 @@
+from config import *
 
 def response_is_json(text_return):
     if response_type(request) == 'application/json':
