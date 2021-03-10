@@ -108,6 +108,7 @@ def ner(text):
 
     ner_proccessed = {
         "chunk_id": chunk_id,
+        "text": text,
         "entities": {
 
         }
@@ -123,7 +124,7 @@ def ner_huggingface(text):
     return ner_huggingface_processed
 
 #%% Text Similarity
-def similarity_tf(similarity_text, num_similar_chunks, similarity_score_treshold):
+def similarity_tf(text, num_similar_chunks, similarity_score_treshold):
     # TODO: port to huggingface:
     # https://huggingface.co/sentence-transformers/bert-base-nli-cls-token
     #
@@ -145,7 +146,7 @@ def similarity_tf(similarity_text, num_similar_chunks, similarity_score_treshold
         documents.append(chunks['c.text'])
         chunk_list.append(chunks['c.chunk_id'])
 
-    base_embeddings = model([similarity_text])
+    base_embeddings = model([text])
     embeddings = model(documents)
 
     scores = cosine_similarity(base_embeddings, embeddings).flatten()
@@ -158,7 +159,7 @@ def similarity_tf(similarity_text, num_similar_chunks, similarity_score_treshold
 
     response_similarity = {
         "chunk_id": chunk_id,
-        "text": similarity_text,
+        "text": text,
         "similarity": [
 
         ]
