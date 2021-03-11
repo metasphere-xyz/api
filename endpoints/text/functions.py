@@ -124,67 +124,64 @@ def ner_huggingface(text):
     return ner_huggingface_processed
 
 #%% Text Similarity
-def similarity_tf(text, num_similar_chunks, similarity_score_treshold):
-    # TODO: port to huggingface:
-    # https://huggingface.co/sentence-transformers/bert-base-nli-cls-token
-    #
-    # model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
-    # model = hub.load("/Users/malte/Desktop/universal-sentence-encoder_4")
-    model = hub.load("models/universal-sentence-encoder_4")
-
-    # TODO: add filter for type (chunk, summary, entity)
-    query = '''
-        MATCH (c:Chunk)
-        RETURN c.chunk_id, c.text
-    '''
-    result = graph.run(query).data()
-
-    documents = []
-    chunk_list = []
-
-    for chunks in result:
-        documents.append(chunks['c.text'])
-        chunk_list.append(chunks['c.chunk_id'])
-
-    base_embeddings = model([text])
-    embeddings = model(documents)
-
-    scores = cosine_similarity(base_embeddings, embeddings).flatten()
-
-    sorted_scores_indexes = sorted(((value, index) for index, value in enumerate(scores)), reverse=True)
-    print(sorted_scores_indexes)
-
-    hash = hashlib.md5(text.encode("utf-8"))
-    chunk_id = hash.hexdigest()
-
-    response_similarity = {
-        "chunk_id": chunk_id,
-        "text": text,
-        "similarity": [
-
-        ]
-    }
-
-    for i in range(num_similar_chunks):
-        index = sorted_scores_indexes[i][1]
-        chunk_id = chunk_list[index]
-        chunk_text = documents[index]
-        score = int(round(sorted_scores_indexes[i][0],2)*100)
-        if 100 > score >= int(similarity_score_treshold):
-            response_similarity['similarity'].append(
-                {
-                    "chunk_id": chunk_id,
-                    "score": score,
-                    "text": chunk_text
-                }
-            )
-    return response_similarity
+# def similarity_tf(text, num_similar_chunks, similarity_score_treshold):
+#     # model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
+#     # model = hub.load("/Users/malte/Desktop/universal-sentence-encoder_4")
+#     model = hub.load("models/universal-sentence-encoder_4")
+#
+#     # TODO: add filter for type (chunk, summary, entity)
+#     query = '''
+#         MATCH (c:Chunk)
+#         RETURN c.chunk_id, c.text
+#     '''
+#     result = graph.run(query).data()
+#
+#     documents = []
+#     chunk_list = []
+#
+#     for chunks in result:
+#         documents.append(chunks['c.text'])
+#         chunk_list.append(chunks['c.chunk_id'])
+#
+#     base_embeddings = model([text])
+#     embeddings = model(documents)
+#
+#     scores = cosine_similarity(base_embeddings, embeddings).flatten()
+#
+#     sorted_scores_indexes = sorted(((value, index) for index, value in enumerate(scores)), reverse=True)
+#     print(sorted_scores_indexes)
+#
+#     hash = hashlib.md5(text.encode("utf-8"))
+#     chunk_id = hash.hexdigest()
+#
+#     response_similarity = {
+#         "chunk_id": chunk_id,
+#         "text": text,
+#         "similarity": [
+#
+#         ]
+#     }
+#
+#     for i in range(num_similar_chunks):
+#         index = sorted_scores_indexes[i][1]
+#         chunk_id = chunk_list[index]
+#         chunk_text = documents[index]
+#         score = int(round(sorted_scores_indexes[i][0],2)*100)
+#         if 100 > score >= int(similarity_score_treshold):
+#             response_similarity['similarity'].append(
+#                 {
+#                     "chunk_id": chunk_id,
+#                     "score": score,
+#                     "text": chunk_text
+#                 }
+#             )
+#     return response_similarity
 
 # %% Text Similarity with HUGGINGFACE
 def similarity_huggingface(text, num_similar_chunks, similarity_score_treshold):
     query = '''
         MATCH (c:Chunk)
-        RETURN c.chunk_id, c.text 
+        RETURN c.chunk_id, c.text
     '''
     result = graph.run(query).data()
 
@@ -208,17 +205,19 @@ def similarity_huggingface(text, num_similar_chunks, similarity_score_treshold):
         model_output = model(**encoded_input)
         sentence_output = model(**encoded_input_sentence)
         sentence_embeddings = model_output[0][:,0]
-        base_embeddings = sentence_output[0][:,0] 
+        base_embeddings = sentence_output[0][:,0]
 
     scores = cosine_similarity(base_embeddings, sentence_embeddings).flatten()
 
     sorted_scores_indexes = sorted(((value, index) for index, value in enumerate(scores)), reverse=True)
     print(sorted_scores_indexes)
 
+    hash = hashlib.md5(text.encode("utf-8"))
+    chunk_id = hash.hexdigest()
+
     response_similarity = {
-        "collection_id": "md5",
-        "chunk_id": "md5",
-        "text": similarity_text,
+        "chunk_id": chunk_id,
+        "text": text,
         "similarity": [
 
         ]

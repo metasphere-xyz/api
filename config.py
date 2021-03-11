@@ -24,7 +24,7 @@ import spacy
 import torch
 from transformers import pipeline, AutoModel, AutoModelForSeq2SeqLM, AutoTokenizer
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
-import tensorflow_hub as hub
+# import tensorflow_hub as hub
 
 # from transformers import pipeline, T5Tokenizer, T5ForConditionalGeneration, T5Config
 
