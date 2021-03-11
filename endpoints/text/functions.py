@@ -49,7 +49,14 @@ def summarizer_torch(text, min_length, max_length):
     return summary
 
 # %% Summarization
+# TODO:
+# Update pipeline:
+# 1. use bert extractive summarizer to filter out most important sentence in chunk
+# 2. pass sentence into summarizer
+
 def summarize(text, aim, deviation, num_summaries, response_type):
+
+
     # md5.update(text.encode("utf-8"))
     hash = hashlib.md5(text.encode("utf-8"))
     chunk_id = hash.hexdigest()
