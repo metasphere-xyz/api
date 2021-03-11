@@ -66,7 +66,7 @@ def summarize(text, aim, deviation, num_summaries, response_type):
 
     response = {
         "chunk_id": chunk_id,
-        "summary": [
+        "summaries": [
         ]
     }
 
