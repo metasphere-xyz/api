@@ -218,7 +218,7 @@ def similarity_huggingface(text, num_similar_chunks, similarity_score_treshold):
     response_similarity = {
         "chunk_id": chunk_id,
         "text": text,
-        "similarity": [
+        "similar_chunks": [
 
         ]
     }
@@ -229,7 +229,7 @@ def similarity_huggingface(text, num_similar_chunks, similarity_score_treshold):
         chunk_text = documents[index]
         score = int(round(sorted_scores_indexes[i][0],2)*100)
         if 100 > score >= int(similarity_score_treshold):
-            response_similarity['similarity'].append(
+            response_similarity['similar_chunks'].append(
                 {
                     "chunk_id": chunk_id,
                     "score": score,
