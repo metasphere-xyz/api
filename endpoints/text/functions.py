@@ -89,7 +89,7 @@ def summarize(text, aim, deviation, num_summaries, response_type):
         hash = hashlib.md5(summary.encode("utf-8"))
         summary_id = hash.hexdigest()
 
-        response["summary"].append({
+        response["summaries"].append({
             "text": summary,
             "summary_id": summary_id,
             "compression": compression,
