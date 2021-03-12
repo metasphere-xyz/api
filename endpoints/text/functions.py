@@ -128,7 +128,11 @@ def ner(text):
         }
     }
     for ent in doc.ents:
-        ner_proccessed['entities'][ent.text]=ent.label_
+        entity_name = ent.text
+        entity_label = ent.label_
+        entity_name = entity_name.replace("the ", "")
+
+        ner_proccessed['entities'][entity_name]=entity_label
 
     return ner_proccessed
 
