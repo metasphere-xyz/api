@@ -132,7 +132,8 @@ def ner(text):
         entity_label = ent.label_
         entity_name = entity_name.replace("the ", "")
 
-        ner_proccessed['entities'][entity_name]=entity_label
+        if entity_label in accepted_entity_labels:
+            ner_proccessed['entities'][entity_name]=entity_label
 
     return ner_proccessed
 

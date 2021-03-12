@@ -43,6 +43,14 @@ text = ""
 nlp = spacy.load("en_core_web_sm")
 ner_huggingface_pipeline = pipeline("ner")
 
+# %% ENTITIY RECOGNITION
+accepted_entity_labels = (
+    'PERSON',
+    'ORG',
+    'DATE',
+    'GPE'
+)
+
 # %% SUMMARIZATION /text/summarization
 
 # # https://pypi.org/project/bert-extractive-summarizer/
