@@ -50,7 +50,9 @@ def summarizer_torch(text, min_length, max_length):
 
 # %% Summarization
 def summarize(text, aim, deviation, num_summaries, response_type):
-    # md5.update(text.encode("utf-8"))
+    # TODO: add sentence segmentation and only return full sentences:
+    # https://spacy.io/usage/linguistic-features#sbd
+    # Alternatively: pass through bert extractive summarizer before processing to filter out most valuable sentence before processing
     hash = hashlib.md5(text.encode("utf-8"))
     chunk_id = hash.hexdigest()
     text_length = len(list(text.split()))
@@ -102,6 +104,9 @@ def summarize(text, aim, deviation, num_summaries, response_type):
 
 # %% NER SpaCy
 def ner(text):
+    # TODO: add coreference resolution before extracting entities:
+    # https://spacy.io/universe/project/neuralcoref
+    # https://towardsdatascience.com/from-text-to-knowledge-the-information-extraction-pipeline-b65e7e30273e
     doc = nlp(text)
     hash = hashlib.md5(text.encode("utf-8"))
     chunk_id = hash.hexdigest()
