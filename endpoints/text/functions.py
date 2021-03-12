@@ -105,6 +105,15 @@ def summarize(text, aim, deviation, num_summaries, response_type):
 # %% NER SpaCy
 def ner(text):
     # TODO: add coreference resolution before extracting entities:
+    # 1. look up chunk in database
+    # 2. if chunk is found, look up previous chunk in chain
+    # 3. run coreference resolution on previous chunk and current chunk
+    # Example:
+    # Chunk 1: Mark Sealy, Director of the Autograph Gallery and the Association of Black Photographers in London, was my guest today in our podcast series.
+    # Chunk 2: Everybody who liked this, or at least parts of this talk, is invited to look at our website and follow us on social media and also have Mark, it was a pleasure to talk to you.
+    # Correct entity: 'Mark Sealy': 'PERSON'
+    # Incorrect entity: 'Mark': 'PERSON'
+    # References:
     # https://spacy.io/universe/project/neuralcoref
     # https://towardsdatascience.com/from-text-to-knowledge-the-information-extraction-pipeline-b65e7e30273e
     doc = nlp(text)
