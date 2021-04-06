@@ -66,6 +66,9 @@ def raise_error(error_type, request=""):
     if error_type == "no text specified":
         message = "Error: No input text specified"
 
+    if error_type == "no chunk sequence specified":
+        message = "Error: Chunk sequence expected. Please use a text specific endpoint for single text tasks."
+
     if error_type == "no id specified":
         message = "Error: No id specified"
 

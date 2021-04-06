@@ -26,3 +26,13 @@ def parse_json(endpoint):
             if not text:
                 raise_error("no text specified")
             return text, aim, deviation, num_summaries
+        elif endpoint == 'summarize_chunk_sequence':
+            chunk_sequence = []
+            try:
+                chunk_sequence = request.get_json()['chunk_sequence']
+            except Exception as ex:
+                raise_error("no chunk sequence specified")
+
+            if len(chunk_sequence) < 1:
+                raise_error("no chunk sequence specified")
+            return chunk_sequence

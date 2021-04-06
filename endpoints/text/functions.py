@@ -102,6 +102,63 @@ def summarize(text, aim, deviation, num_summaries, response_type):
     return response
 
 
+def sequence_by_speaker(chunk_sequence):
+    try:
+        json_loads(chunk_sequence)
+    except:
+        print ("error")
+
+    if len(chunk_sequence) > 1:
+        chunks_by_speaker = []
+
+        sequence = 0
+        speaker = ""
+
+        for chunk in chunk_sequence:
+            if speaker != chunk["speaker"]:
+                speaker = chunk["speaker"]
+                sequence = len(chunks_by_speaker)
+                chunks_by_speaker.append([{}])
+                chunks_by_speaker[sequence] = []
+            chunks_by_speaker[sequence].append(dict(chunk))
+
+        return json.dumps(chunks_by_speaker)
+
+# %% summarize chunk sequence
+# Takes a chunk sequence as argument, joins contributions per speaker, summarizes chunk sequence per speaker
+
+
+def summarize_chunk_sequence(chunk_sequence):
+    response = {
+        "chunk_sequence": []
+    }
+
+    chunks_by_speaker = json.loads(sequence_by_speaker(chunk_sequence))
+
+    for sequence in chunks_by_speaker:
+        speaker = sequence[0]["speaker"]
+        contribution = ""
+        print(speaker)
+
+        for chunk in sequence:
+            contribution += chunk["text"] + " "
+
+        num_chunks = len(sequence)
+        print ("num_chunks: " + str(num_chunks))
+        ratio = int(num_chunks)/int(summary_percentage_document)
+        print ("ratio: " + str(ratio))
+        print (preprocess(contribution))
+
+        # summaries = sentence_summarizer(preprocess(contribution), ratio=ratio)
+        summaries = nlp(sentence_summarizer(preprocess(contribution), num_sentences=0, min_length=2))
+
+        for sentence in summaries.sents:
+            for chunk in sequence:
+                if sentence.text in chunk["text"]:
+                    response["chunk_sequence"].append(chunk)
+
+    return response
+
 # %% NER SpaCy
 def ner(text):
     # TODO: add coreference resolution before extracting entities:

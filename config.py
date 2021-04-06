@@ -55,12 +55,14 @@ accepted_entity_labels = (
 
 # # https://pypi.org/project/bert-extractive-summarizer/
 # # useful for summarizing multiple sentences to less sentences
-# from summarizer import Summarizer
-# sentences_summarizes = Summarizer()
+from summarizer import Summarizer
+sentence_summarizer = Summarizer()
 
 aim = "50"
 deviation = "10"
 num_summaries = "3"
+summary_percentage_document = "10"
+chunk_sequence = []
 
 # summarization_model = "facebook/bart-base"
 # summarization_model = "facebook/bart-large-cnn"
