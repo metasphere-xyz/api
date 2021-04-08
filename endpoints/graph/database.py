@@ -85,9 +85,9 @@ def add_chunk_to_collection(text, source_file, start_time, end_time, summaries, 
         'source_file': source_file,
         'start_time': start_time,
         'end_time': end_time,
-        'summaries': [],
-        'entities': [],
-        'similarity': [],
+        'summaries': "",
+        'entities': "",
+        'similarity': "",
         'collection_id': collection_id
     }
 
@@ -186,6 +186,7 @@ def add_summary_to_chunk(chunk_id, summary_id, text, compression, aim, deviation
 def update_chunk_data(chunk_id, text, source_file, start_time, end_time, summaries, entities, similarity, collection_id):
     query = '''
         MATCH (c:Chunk {chunk_id: $chunk_id})
+
         SET c.text = $text,
         c.source_file = $source_file,
         c.start_time = $start_time,
@@ -202,9 +203,9 @@ def update_chunk_data(chunk_id, text, source_file, start_time, end_time, summari
         'source_file': source_file,
         'start_time': start_time,
         'end_time': end_time,
-        'summaries': [],
-        'entities': [],
-        'similarity': [],
+        'summaries': summaries,
+        'entities': entities,
+        'similarity': entities,
         'collection_id': collection_id
     }
 
