@@ -1,0 +1,27 @@
+# Development tools
+.DS_Store
+.vscode
+.remote-sync.json
+
+# Environments
+.env
+.venv
+env/
+venv/
+env.bak/
+venv.bak/
+
+# ML Models
+models/
+
+# Byte-compiled
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# pyenv
+.python-version
