@@ -24,7 +24,7 @@ import spacy
 import torch
 from transformers import pipeline, AutoModel, AutoModelForSeq2SeqLM, AutoTokenizer
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
-# import tensorflow_hub as hub
+import tensorflow_hub as hub
 
 # from transformers import pipeline, T5Tokenizer, T5ForConditionalGeneration, T5Config
 
@@ -55,8 +55,8 @@ accepted_entity_labels = (
 
 # # https://pypi.org/project/bert-extractive-summarizer/
 # # useful for summarizing multiple sentences to less sentences
-from summarizer import Summarizer
-sentence_summarizer = Summarizer()
+# from summarizer import Summarizer
+# sentences_summarizes = Summarizer()
 
 aim = "50"
 deviation = "10"

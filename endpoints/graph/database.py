@@ -183,6 +183,34 @@ def add_summary_to_chunk(chunk_id, summary_id, text, compression, aim, deviation
     response = submit(query, parameters)
     return response
 
+def update_chunk_data(chunk_id, text, source_file, start_time, end_time, summaries, entities, similarity, collection_id):
+    query = '''
+        MATCH (c:Chunk {chunk_id: $chunk_id})
+        SET c.text = $text,
+        c.source_file = $source_file,
+        c.start_time = $start_time,
+        c.end_time = $end_time,
+        c.summaries = $summaries,
+        c.entities = $entities,
+        c.similarity = $similarity,
+        c.collection_id = $collection_id
+        RETURN c as db_return
+    '''
+    parameters={
+        'chunk_id': chunk_id,
+        'text': text,
+        'source_file': source_file,
+        'start_time': start_time,
+        'end_time': end_time,
+        'summaries': [],
+        'entities': [],
+        'similarity': [],
+        'collection_id': collection_id
+    }
+
+    response = submit(query, parameters)
+    return response
+
 def connect_chunk_to_chunk(connect, with_id, with_score):
     query = '''
         MATCH(n1 {chunk_id: $start_id}),(n2 {chunk_id: $end_id})

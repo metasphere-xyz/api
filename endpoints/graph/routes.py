@@ -146,6 +146,25 @@ def add_unwrap_chunk():
     response = respond_with_json(unwrap_chunk)
     return response
 
+@graph_routes.route('/update/chunk', methods=['POST', 'GET'])
+def update_chunk():
+    chunk_id, text, source_file, start_time, end_time, summaries, entities, similarity, collection_id = update_chunk_json_value()
+
+    updated_chunk = update_chunk_data(
+        chunk_id, 
+        text, 
+        source_file, 
+        start_time, 
+        end_time, 
+        summaries, 
+        entities, 
+        similarity, 
+        collection_id
+        )
+    response = respond_with_json(updated_chunk)
+    return response
+
+
 @graph_routes.route('/connect/chunk', methods=['POST', 'GET'])
 def connect_chunk():
     connect, with_id, with_score = connect_chunk_json_value()

@@ -56,6 +56,21 @@ def get_summary_json_value():
     else:
         return 'json expected'
 
+def update_chunk_json_value():
+    if request_type(request) == 'application/json':
+        chunk_id = request.get_json()['chunk_id']
+        text = request.get_json()['text']
+        source_file = request.get_json()['source_file']
+        start_time = request.get_json()['start_time']
+        end_time = request.get_json()['end_time']
+        summaries = request.get_json()['summaries']
+        entities = request.get_json()['entities']
+        similarity = request.get_json()['similarity']
+        collection_id = request.get_json()['collection_id']
+        return chunk_id, text, source_file, start_time, end_time, summaries, entities, similarity, collection_id
+    else:
+        return 'json expected'
+
 def connect_chunk_json_value():
     if request_type(request) == 'application/json':
         connect = request.get_json()['connect']
