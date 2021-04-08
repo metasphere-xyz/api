@@ -17,7 +17,6 @@ def return_ner():
 
 @text_routes.route('/similarities', methods=['POST', 'GET'])
 def return_similarities():
-<<<<<<< HEAD
     (text, num_similar_chunks, similarity_score_treshold) = parse_json('similarity')
     # similar_chunks = similarity_tf(text, num_similar_chunks, similarity_score_treshold)
     similar_chunks = similarity_huggingface(text, num_similar_chunks, similarity_score_treshold)
@@ -35,14 +34,6 @@ def return_summarize_chunk_sequence():
         response = respond_with_json(chunks)
         return response
 
-
-=======
-    text, num_similar_chunks, similarity_score_treshold = parse_json('similarity')
-    similar_chunks = similarity_tf(text, num_similar_chunks, similarity_score_treshold)
-    response = respond_with_json(similar_chunks)
-    return response
-
->>>>>>> 135d02a0982f27b8e4e0337b123d031d3fc39403
 @text_routes.route('/summarize', methods=['POST', 'GET'])
 def return_summaries():
     if request_type(request) == 'text/plain':

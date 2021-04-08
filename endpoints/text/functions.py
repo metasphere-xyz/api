@@ -49,22 +49,10 @@ def summarizer_torch(text, min_length, max_length):
     return summary
 
 # %% Summarization
-<<<<<<< HEAD
 def summarize(text, aim, deviation, num_summaries, response_type):
     # TODO: add sentence segmentation and only return full sentences:
     # https://spacy.io/usage/linguistic-features#sbd
     # Alternatively: pass through bert extractive summarizer before processing to filter out most valuable sentence before processing
-=======
-# TODO:
-# Update pipeline:
-# 1. use bert extractive summarizer to filter out most important sentence in chunk
-# 2. pass sentence into summarizer
-
-def summarize(text, aim, deviation, num_summaries, response_type):
-
-
-    # md5.update(text.encode("utf-8"))
->>>>>>> 135d02a0982f27b8e4e0337b123d031d3fc39403
     hash = hashlib.md5(text.encode("utf-8"))
     chunk_id = hash.hexdigest()
     text_length = len(list(text.split()))
@@ -80,11 +68,7 @@ def summarize(text, aim, deviation, num_summaries, response_type):
 
     response = {
         "chunk_id": chunk_id,
-<<<<<<< HEAD
         "summaries": [
-=======
-        "summary": [
->>>>>>> 135d02a0982f27b8e4e0337b123d031d3fc39403
         ]
     }
 
@@ -107,11 +91,7 @@ def summarize(text, aim, deviation, num_summaries, response_type):
         hash = hashlib.md5(summary.encode("utf-8"))
         summary_id = hash.hexdigest()
 
-<<<<<<< HEAD
         response["summaries"].append({
-=======
-        response["summary"].append({
->>>>>>> 135d02a0982f27b8e4e0337b123d031d3fc39403
             "text": summary,
             "summary_id": summary_id,
             "compression": compression,
@@ -122,7 +102,6 @@ def summarize(text, aim, deviation, num_summaries, response_type):
     return response
 
 
-<<<<<<< HEAD
 def sequence_by_speaker(chunk_sequence):
     try:
         json_loads(chunk_sequence)
@@ -194,10 +173,6 @@ def ner(text):
     # References:
     # https://spacy.io/universe/project/neuralcoref
     # https://towardsdatascience.com/from-text-to-knowledge-the-information-extraction-pipeline-b65e7e30273e
-=======
-# %% NER SpaCy
-def ner(text):
->>>>>>> 135d02a0982f27b8e4e0337b123d031d3fc39403
     doc = nlp(text)
     hash = hashlib.md5(text.encode("utf-8"))
     chunk_id = hash.hexdigest()
@@ -210,16 +185,12 @@ def ner(text):
         }
     }
     for ent in doc.ents:
-<<<<<<< HEAD
         entity_name = ent.text
         entity_label = ent.label_
         entity_name = entity_name.replace("the ", "")
 
         if entity_label in accepted_entity_labels:
             ner_proccessed['entities'][entity_name]=entity_label
-=======
-        ner_proccessed['entities'][ent.text]=ent.label_
->>>>>>> 135d02a0982f27b8e4e0337b123d031d3fc39403
 
     return ner_proccessed
 
@@ -229,7 +200,6 @@ def ner_huggingface(text):
     return ner_huggingface_processed
 
 #%% Text Similarity
-<<<<<<< HEAD
 # def similarity_tf(text, num_similar_chunks, similarity_score_treshold):
 #     # model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
 #     # model = hub.load("/Users/malte/Desktop/universal-sentence-encoder_4")
@@ -285,17 +255,6 @@ def ner_huggingface(text):
 
 # %% Text Similarity with HUGGINGFACE
 def similarity_huggingface(text, num_similar_chunks, similarity_score_treshold):
-=======
-def similarity_tf(text, num_similar_chunks, similarity_score_treshold):
-    # TODO: port to huggingface:
-    # https://huggingface.co/sentence-transformers/bert-base-nli-cls-token
-    #
-    # model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
-    # model = hub.load("/Users/malte/Desktop/universal-sentence-encoder_4")
-    model = hub.load("models/universal-sentence-encoder_4")
-
-    # TODO: add filter for type (chunk, summary, entity)
->>>>>>> 135d02a0982f27b8e4e0337b123d031d3fc39403
     query = '''
         MATCH (c:Chunk)
         RETURN c.chunk_id, c.text
@@ -309,7 +268,6 @@ def similarity_tf(text, num_similar_chunks, similarity_score_treshold):
         documents.append(chunks['c.text'])
         chunk_list.append(chunks['c.chunk_id'])
 
-<<<<<<< HEAD
     #Load AutoModel from huggingface model repository
     tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
     model = AutoModel.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
@@ -326,12 +284,6 @@ def similarity_tf(text, num_similar_chunks, similarity_score_treshold):
         base_embeddings = sentence_output[0][:,0]
 
     scores = cosine_similarity(base_embeddings, sentence_embeddings).flatten()
-=======
-    base_embeddings = model([text])
-    embeddings = model(documents)
-
-    scores = cosine_similarity(base_embeddings, embeddings).flatten()
->>>>>>> 135d02a0982f27b8e4e0337b123d031d3fc39403
 
     sorted_scores_indexes = sorted(((value, index) for index, value in enumerate(scores)), reverse=True)
     print(sorted_scores_indexes)
@@ -342,11 +294,7 @@ def similarity_tf(text, num_similar_chunks, similarity_score_treshold):
     response_similarity = {
         "chunk_id": chunk_id,
         "text": text,
-<<<<<<< HEAD
         "similar_chunks": [
-=======
-        "similarity": [
->>>>>>> 135d02a0982f27b8e4e0337b123d031d3fc39403
 
         ]
     }
@@ -357,11 +305,7 @@ def similarity_tf(text, num_similar_chunks, similarity_score_treshold):
         chunk_text = documents[index]
         score = int(round(sorted_scores_indexes[i][0],2)*100)
         if 100 > score >= int(similarity_score_treshold):
-<<<<<<< HEAD
             response_similarity['similar_chunks'].append(
-=======
-            response_similarity['similarity'].append(
->>>>>>> 135d02a0982f27b8e4e0337b123d031d3fc39403
                 {
                     "chunk_id": chunk_id,
                     "score": score,
@@ -369,7 +313,3 @@ def similarity_tf(text, num_similar_chunks, similarity_score_treshold):
                 }
             )
     return response_similarity
-<<<<<<< HEAD
-=======
-# %%
->>>>>>> 135d02a0982f27b8e4e0337b123d031d3fc39403
