@@ -98,4 +98,4 @@ summarization_model_parameters = {
 # %% SIMILARITY /text/similarities
 num_similar_chunks = "3"
 default_edge_weigth = "50"
-similarity_score_treshold = "30"
+similarity_score_treshold = "80"
