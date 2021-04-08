@@ -5,6 +5,7 @@ from functions import *
 from endpoints.graph.database import *
 from endpoints.graph.response import *
 from endpoints.graph.request import *
+from endpoints.graph.helper import *
 
 from flask import Blueprint
 graph_routes = Blueprint('graph', __name__)
@@ -150,9 +151,43 @@ def add_unwrap_chunk():
 def update_chunk():
     chunk_id, text, source_file, start_time, end_time, summaries, entities, similarity, collection_id = update_chunk_json_value()
 
-    updated_chunk = update_chunk_data(
+    response = find_chunk(chunk_id)
+
+    if response["status"]=="success":
+        print("chunk was found")
+        if source_file != None:
+            source_file = source_file
+        else:
+            source_file = response["instance"]["source_file"]
+
+        if start_time != None:
+            start_time = start_time
+        else:
+            start_time = response["instance"]["start_time"]
+
+        if end_time != None:
+            end_time = end_time
+        else:
+            end_time = response["instance"]["end_time"]
+
+        if summaries != None:
+            summaries = summaries
+        else:
+            summaries = response["instance"]["summaries"]
+
+        if entities != None:
+            entities = entities
+        else:
+            entities = response["instance"]["entities"]
+        
+        if similarity != None:
+            similarity = similarity
+        else:
+            similarity = response["instance"]["similarity"]
+        
+        updated_chunk = update_chunk_data(
         chunk_id, 
-        text, 
+        text,
         source_file, 
         start_time, 
         end_time, 
@@ -161,7 +196,11 @@ def update_chunk():
         similarity, 
         collection_id
         )
-    response = respond_with_json(updated_chunk)
+        response = respond_with_json(updated_chunk)    
+    else:
+        print("chunk does not exist")    
+
+    
     return response
 
 
