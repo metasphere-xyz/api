@@ -47,7 +47,6 @@ ner_huggingface_pipeline = pipeline("ner")
 accepted_entity_labels = (
     'PERSON',
     'ORG',
-    'DATE',
     'GPE'
 )
 
