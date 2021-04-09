@@ -47,8 +47,13 @@ ner_huggingface_pipeline = pipeline("ner")
 accepted_entity_labels = (
     'PERSON',
     'ORG',
-    'DATE',
-    'GPE'
+    'GPE',
+    'WORK_OF_ART',
+    'NORP',
+    'FAC',
+    'LOC',
+    'PRODUCT',
+    'LAW'
 )
 
 # %% SUMMARIZATION /text/summarization
