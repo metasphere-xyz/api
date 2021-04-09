@@ -69,8 +69,8 @@ accepted_entity_labels = (
 
 # # https://pypi.org/project/bert-extractive-summarizer/
 # # useful for summarizing multiple sentences to less sentences
-from summarizer import Summarizer
-sentence_summarizer = Summarizer()
+# from summarizer import Summarizer
+# sentence_summarizer = Summarizer()
 
 aim = "50"
 deviation = "10"

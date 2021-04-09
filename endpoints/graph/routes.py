@@ -75,7 +75,21 @@ def return_summary_viaGET(summary_id):
 def add_collection():
     name, source_type, source_path, date, chunk_sequence = get_collection_json_value()
 
-    collection = add_collection_without_connections(
+    collection_with_chunks = add_collection_with_chunks(
+        name,
+        source_type,
+        source_path,
+        date,
+        chunk_sequence
+        )
+    response = respond_with_json(collection_with_chunks)
+    return response
+
+@graph_routes.route('/add/collection-without-chunks', methods=['POST', 'GET'])
+def add_collection_no_chunks():
+    name, source_type, source_path, date, chunk_sequence = get_collection_json_value()
+
+    collection = add_collection_without_chunks(
         name,
         source_type,
         source_path,
