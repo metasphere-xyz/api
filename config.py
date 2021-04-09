@@ -41,6 +41,7 @@ graph = Graph(
 # %% GENERAL NLP
 text = ""
 nlp = spacy.load("en_core_web_sm")
+stopwords = nlp.Defaults.stop_words
 ner_huggingface_pipeline = pipeline("ner")
 
 # %% ENTITIY RECOGNITION
