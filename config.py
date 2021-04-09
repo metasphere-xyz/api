@@ -16,6 +16,7 @@ import hashlib
 md5 = hashlib.md5()
 from sklearn.metrics.pairwise import cosine_similarity
 from fuzzy_match import algorithims as algorithms
+from fuzzy_match import match
 
 # nlp libraries
 import spacy
@@ -27,6 +28,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 import tensorflow_hub as hub
 
 # from transformers import pipeline, T5Tokenizer, T5ForConditionalGeneration, T5Config
+
+
+# %% LOGGING
+from rich import print
+from rich import pretty
+pretty.install()
 
 
 # %% DATABASE
@@ -42,6 +49,7 @@ graph = Graph(
 text = ""
 nlp = spacy.load("en_core_web_sm")
 stopwords = nlp.Defaults.stop_words
+
 ner_huggingface_pipeline = pipeline("ner")
 
 # %% ENTITIY RECOGNITION

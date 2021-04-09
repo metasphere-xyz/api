@@ -162,26 +162,38 @@ def summarize_chunk_sequence(chunk_sequence):
 # %% NER SpaCy
 def ner(text):
     # TODO: port coreference resolution from media/processors/pushCollection.py
-    doc = nlp(text)
+    doc = nlp(preprocess(text))
     hash = hashlib.md5(text.encode("utf-8"))
     chunk_id = hash.hexdigest()
 
-    ner_proccessed = {
+    response = {
         "chunk_id": chunk_id,
         "text": text,
-        "entities": {
-
-        }
+        "entities": {}
     }
-    for ent in doc.ents:
-        entity_name = ent.text
-        entity_label = ent.label_
-        entity_name = entity_name.replace("the ", "")
 
-        if entity_label in accepted_entity_labels:
-            ner_proccessed['entities'][entity_name]=entity_label
+    entities = {}
+    entity_names = ''
+    nouns = []
 
-    return ner_proccessed
+    def clean_up(entity_name):
+        return entity_name.replace("the ", "").replace("The ", "").replace("this ", "").replace("’s", "").replace("...", "")
+
+    for entity in doc.ents:
+        if entity.label_ in accepted_entity_labels:
+            entities.update({clean_up(entity.lemma_): entity.label_})
+            entity_names += clean_up(entity.lemma_)
+
+    for noun in doc.noun_chunks:
+        if noun.root.lemma_.lower() not in stopwords and not noun.root.lemma_.isnumeric():
+            if noun.root.lemma_ not in entity_names:
+                entities.update({noun.root.lemma_: 'NOUN'})
+                entity_names += clean_up(noun.root.lemma_)
+
+    response["entities"] = entities
+
+    print(response)
+    return response
 
 # %% NER Huggingface
 def ner_huggingface(text):
