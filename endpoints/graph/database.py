@@ -205,7 +205,7 @@ def update_chunk_data(chunk_id, text, source_file, start_time, end_time, summari
         'end_time': end_time,
         'summaries': summaries,
         'entities': entities,
-        'similarity': entities,
+        'similarity': similarity,
         'collection_id': collection_id
     }
 

@@ -151,8 +151,9 @@ def add_unwrap_chunk():
 def update_chunk():
     chunk_id, text, source_file, start_time, end_time, summaries, entities, similarity, collection_id = update_chunk_json_value()
 
-    response = find_chunk(chunk_id)
+    # optionalParameter(chunk_id, source_file, start_time, end_time, summaries, entities, similarity)
 
+    response = find_chunk(chunk_id)
     if response["status"]=="success":
         print("chunk was found")
         if source_file != None:
@@ -195,12 +196,11 @@ def update_chunk():
         entities, 
         similarity, 
         collection_id
-        )
-        response = respond_with_json(updated_chunk)    
+    )
     else:
-        print("chunk does not exist")    
-
+        print("chunk does not exist")  
     
+    response = respond_with_json(updated_chunk)  
     return response
 
 
