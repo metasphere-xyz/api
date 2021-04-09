@@ -51,7 +51,64 @@ def find_summary(summary):
     response = submit(query, parameters)
     return response
 
-def add_collection_without_connections(name, source_type, source_path, date, chunk_sequence):
+def add_collection_with_chunks(name, source_type, source_path, date, chunk_sequence):
+    hash = hashlib.md5(name[0].encode("utf-8"))
+    collection_id = hash.hexdigest()
+
+    chunk_ids = []
+    for chunk in chunk_sequence:
+        chunk_ids.append(chunk['chunk_id'])
+
+    query_1 = '''
+        WITH $chunk_sequence AS seq
+        UNWIND seq AS data
+        CREATE(c:Chunk)
+        SET c = data
+        SET c.name = data.source_file
+        WITH c
+        ORDER BY c.name ASC
+        WITH collect(c) as chunks
+        CALL apoc.nodes.link(chunks, 'NEXT_CHUNK')
+        RETURN chunks as db_return
+    '''
+
+    query_2 = '''
+        CREATE(co:Collection {collection_id: $collection_id, name: $name, source_type: $source_type, source_path: $source_path, date: $date, chunk_sequence: $chunk_ids})
+        RETURN co as db_return
+    '''
+
+    query_3 = '''
+        MATCH (c:Chunk {collection_id: $collection_id}),(co:Collection {collection_id: $collection_id})
+        WITH COLLECT(c) AS chunks, co
+        FOREACH (ch IN chunks |
+            CREATE (ch)-[:CONTAINED_IN]->(co))
+        RETURN co as db_return
+    '''
+
+    parameters_1 = {
+        'chunk_sequence': chunk_sequence
+    }
+
+    parameters_2 = {
+        'collection_id': collection_id,
+        'name': name,
+        'source_type': source_type,
+        'source_path': source_path,
+        'date': date, 
+        'chunk_sequence': chunk_sequence,
+        'chunk_ids': chunk_ids
+    }
+
+    parameters_3 = {
+        'collection_id': collection_id
+    }
+
+    submit(query_1, parameters_1)
+    submit(query_2, parameters_2)
+    response = submit(query_3, parameters_3)
+    return response
+
+def add_collection_without_chunks(name, source_type, source_path, date, chunk_sequence):
     query = '''
         CREATE(co:Collection {name: $name, source_type: $source_type, source_path: $source_path, date: $date, chunk_sequence: $chunk_sequence})
         RETURN co as db_return
