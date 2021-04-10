@@ -4,6 +4,7 @@ from functions import *
 
 # %% modules
 import os
+import re
 
 # API and requests
 from flask import *
