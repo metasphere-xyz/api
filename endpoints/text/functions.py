@@ -183,26 +183,36 @@ def ner(text):
             .replace("this ", "") \
             .replace("’s", "") \
             .replace("...", "") \
+            .replace('" ', "") \
+            .replace('"', "") \
             .replace(" - ", "-") \
-            .replace("a ", "")
+            .strip()
         return cleaned_entity
+
+    # find hardcoded entities
+    hardcoded_entities = re.findall('\"((\w+\W)*\w+)', text)
+    for entity in hardcoded_entities:
+        found_entity = entity[0].replace('\\', '')
+        entities.update({clean_up(found_entity): 'HARDCODED'})
+        entity_names += clean_up(found_entity)
 
     for entity in doc.ents:
         if entity.label_ in accepted_entity_labels:
             entities.update({clean_up(entity.lemma_): entity.label_})
             entity_names += clean_up(entity.lemma_)
 
-    for noun in doc.noun_chunks:
-        if noun.lemma_.lower() not in stopwords and not noun.lemma_.isnumeric():
-            if noun.lemma_ not in entity_names:
-                entities.update({clean_up(noun.lemma_): 'NOUN'})
-                entity_names += clean_up(noun.lemma_)
+    # for noun in doc.noun_chunks:
+    #     if noun.root.lemma_.lower() not in stopwords and not noun.root.lemma_.isnumeric():
+    #         if noun.root.lemma_ not in entity_names:
+    #             entities.update({clean_up(noun.root.lemma_): 'NOUN'})
+    #             entity_names += clean_up(noun.root.lemma_)
 
-    for (entity, entity_label) in entities.items():
-        response["entities"].append({
-            "entity_name": entity,
-            "entity_label": entity_label
-        })
+    for (entity_name, entity_label) in entities.items():
+        if entity_name != '':
+            response["entities"].append({
+                "entity_name": entity_name,
+                "entity_label": entity_label
+            })
 
     print(response)
     return response
