@@ -1,17 +1,26 @@
 ## config.py
 
+checkmark = f"[green]"u'\u2713 '
+cross = f"[red]"u'\u00D7 '
+eye = f"[white]"u'\u2022 '
+arrow = f"[grey]"u'\u21B3 '
+database = f"[white]DATABASE[/white]:"
+
 # %% LOGGING
 from rich import print
 from rich import pretty
 pretty.install()
 
-print (f"[bold green]Starting up...[/bold green]")
+print (f"[bold green]Starting up.[/bold green]")
 
+print (eye, f"Loading [bold]functions[/bold].")
 from functions import *
 
+print (eye, f"Loading [bold]modules[/bold].")
 # %% modules
 import os
 import re
+import sys
 
 # API and requests
 from flask import *
@@ -26,12 +35,23 @@ from sklearn.metrics.pairwise import cosine_similarity
 from fuzzy_match import algorithims as algorithms
 from fuzzy_match import match
 
+print (eye, f"Loading [bold]spacy[/bold].")
 # nlp libraries
 import spacy
+# %% GENERAL NLP
+text = ""
+nlp = spacy.load("en_core_web_sm")
+stopwords = nlp.Defaults.stop_words
 
 # maschine learning models and pipeplines
-import torch
+# print (eye, f"Loading [bold]torch[/bold].")
+# import torch
+
+print (eye, f"Loading [bold]huggingface[/bold].")
 from transformers import pipeline, AutoModel, AutoModelForSeq2SeqLM, AutoTokenizer
+ner_huggingface_pipeline = pipeline("ner")
+
+print (eye, f"Loading [bold]tensorflow[/bold].")
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 import tensorflow_hub as hub
 
@@ -39,20 +59,20 @@ import tensorflow_hub as hub
 
 
 # %% DATABASE
+print (eye, f"Connecting to [bold]graph database[/bold].")
 from py2neo import Graph
-graph = Graph(
-    "bolt://ecchr.metasphere.xyz:7687/",
-    auth=('neo4j', 'burr-query-duel-cherry')
-)
+try:
+    graph = Graph(
+        "bolt://ecchr.metasphere.xyz:7687/",
+        auth=('neo4j', 'burr-query-duel-cherry')
+    )
+except:
+    print (cross, f"Can't connect to graph database. Exiting.")
+    sys.exit(1)
+finally:
+    print (checkmark, f"Connected to graph database.")
 
 
-
-# %% GENERAL NLP
-text = ""
-nlp = spacy.load("en_core_web_sm")
-stopwords = nlp.Defaults.stop_words
-
-ner_huggingface_pipeline = pipeline("ner")
 
 # %% ENTITIY RECOGNITION
 accepted_entity_labels = (
