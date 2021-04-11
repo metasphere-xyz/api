@@ -108,7 +108,7 @@ def add_collection_with_chunks(collection_id, name, source_type, source_path, da
         MATCH (c:Chunk {collection_id: $collection_id}),(co:Collection {collection_id: $collection_id})
         WITH COLLECT(c) AS chunks, co
         FOREACH (ch IN chunks |
-            CREATE (ch)-[:CONTAINED_IN]->(co))
+            CREATE (co)-[:CONTAINS]->(ch))
         RETURN co as db_return
     '''
 
