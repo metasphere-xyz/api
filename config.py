@@ -13,10 +13,10 @@ pretty.install()
 
 print (f"[bold green]Starting up.[/bold green]")
 
-print (eye, f"Loading [bold]functions[/bold].")
+print (eye, f"[bold]Loading [/bold]functions.")
 from functions import *
 
-print (eye, f"Loading [bold]modules[/bold].")
+print (eye, f"[bold]Loading [/bold]modules.")
 # %% modules
 import os
 import re
@@ -35,11 +35,13 @@ from sklearn.metrics.pairwise import cosine_similarity
 from fuzzy_match import algorithims as algorithms
 from fuzzy_match import match
 
-print (eye, f"Loading [bold]spacy[/bold].")
+print (eye, f"[bold]Loading[/bold] spacy.")
+
 # nlp libraries
 import spacy
 # %% GENERAL NLP
 text = ""
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 nlp = spacy.load("en_core_web_sm")
 stopwords = nlp.Defaults.stop_words
 
@@ -47,19 +49,18 @@ stopwords = nlp.Defaults.stop_words
 # print (eye, f"Loading [bold]torch[/bold].")
 # import torch
 
-print (eye, f"Loading [bold]huggingface[/bold].")
+print (eye, f"[bold]Loading[/bold] huggingface.")
 from transformers import pipeline, AutoModel, AutoModelForSeq2SeqLM, AutoTokenizer
 ner_huggingface_pipeline = pipeline("ner")
 
-print (eye, f"Loading [bold]tensorflow[/bold].")
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
+print (eye, f"[bold]Loading[/bold] tensorflow.")
 import tensorflow_hub as hub
 
 # from transformers import pipeline, T5Tokenizer, T5ForConditionalGeneration, T5Config
 
 
 # %% DATABASE
-print (eye, f"Connecting to [bold]graph database[/bold].")
+print (eye, f"[bold]Connecting to[/bold] graph database.")
 from py2neo import Graph
 try:
     graph = Graph(
