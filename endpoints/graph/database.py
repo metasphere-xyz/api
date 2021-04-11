@@ -51,9 +51,8 @@ def find_summary(summary):
     response = submit(query, parameters)
     return response
 
-def add_collection_with_chunks(name, source_type, source_path, date, chunk_sequence):
-    # hash = hashlib.md5(name[0].encode("utf-8"))
-    # collection_id = hash.hexdigest()
+def add_collection_with_chunks(collection_id, name, source_type, source_path, date, intro_audio, 
+        outro_audio, intro_text, trigger_warning, num_chunks, chunk_sequence):
 
     chunk_ids = []
     for chunk in chunk_sequence:
@@ -73,7 +72,7 @@ def add_collection_with_chunks(name, source_type, source_path, date, chunk_seque
     '''
 
     query_2 = '''
-        CREATE(co:Collection {collection_id: $collection_id, name: $name, source_type: $source_type, source_path: $source_path, date: $date, $intro_audio: intro_audio, $outro_audio: outro_audio, $intro_text: intro_text, $num_chunks: num_chunks, chunk_sequence: $chunk_ids})
+        CREATE(co:Collection {collection_id: $collection_id, name: $name, source_type: $source_type, source_path: $source_path, date: $date, intro_audio: $intro_audio, outro_audio: $outro_audio, intro_text: $intro_text, num_chunks: $num_chunks, chunk_sequence: $chunk_ids})
         RETURN co as db_return
     '''
 
@@ -108,8 +107,11 @@ def add_collection_with_chunks(name, source_type, source_path, date, chunk_seque
     }
 
     submit(query_1, parameters_1)
+    print("query_1 completed")
     submit(query_2, parameters_2)
+    print("query_2 completed")
     response = submit(query_3, parameters_3)
+    print("query_3 completed")
     return response
 
 def add_collection_without_chunks(name, source_type, source_path, date, chunk_sequence):
@@ -208,9 +210,11 @@ def add_unwrap_chunk_to_collection(text, source_file, start_time, end_time, summ
     return response
 
 def add_entity_to_chunk(chunk_id, name, url, entity_label):
+
     query = '''
-        CREATE (e:Entity:ORG {name: $name, url: $url})
-        SET e:$entity_label
+        CREATE (e:Entity {name: $name, url: $url})
+        WITH e
+        CALL apoc.create.addLabels(e, $entity_label) YIELD node
         WITH e
         MATCH (c:Chunk {chunk_id: $chunk_id})
         CREATE (c)-[:MENTIONS]->(e)

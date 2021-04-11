@@ -13,7 +13,7 @@ graph_routes = Blueprint('graph', __name__)
 @graph_routes.route('/find', methods=['POST', 'GET'])
 def return_node():
     search = get_single_json_value()
-    # if not chunk_id:
+    # if not chunk_id:http://127.0.0.1:5000/graph/add/collection
     #     raise_error('no id specified')
     nodes = find_node(search)
     response = respond_with_json(nodes)
@@ -73,13 +73,19 @@ def return_summary_viaGET(summary_id):
 
 @graph_routes.route('/add/collection', methods=['POST', 'GET'])
 def add_collection():
-    name, source_type, source_path, date, chunk_sequence = get_collection_json_value()
+    collection_id, name, source_type, source_path, date, intro_audio, outro_audio, intro_text, trigger_warning, num_chunks, chunk_sequence = get_collection_json_value()
 
     collection_with_chunks = add_collection_with_chunks(
+        collection_id,
         name,
         source_type,
         source_path,
         date,
+        intro_audio, 
+        outro_audio, 
+        intro_text, 
+        trigger_warning, 
+        num_chunks,
         chunk_sequence
         )
     response = respond_with_json(collection_with_chunks)
@@ -87,13 +93,19 @@ def add_collection():
 
 @graph_routes.route('/add/collection-without-chunks', methods=['POST', 'GET'])
 def add_collection_no_chunks():
-    name, source_type, source_path, date, chunk_sequence = get_collection_json_value()
+    collection_id, name, source_type, source_path, date, intro_audio, outro_audio, intro_text, trigger_warning, num_chunks, chunk_sequence = get_collection_json_value()
 
     collection = add_collection_without_chunks(
+        collection_id,
         name,
         source_type,
         source_path,
         date,
+        intro_audio, 
+        outro_audio, 
+        intro_text, 
+        trigger_warning, 
+        num_chunks,
         chunk_sequence
         )
     response = respond_with_json(collection)
