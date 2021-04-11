@@ -81,10 +81,10 @@ def add_collection():
         source_type,
         source_path,
         date,
-        intro_audio, 
-        outro_audio, 
-        intro_text, 
-        trigger_warning, 
+        intro_audio,
+        outro_audio,
+        intro_text,
+        trigger_warning,
         num_chunks,
         chunk_sequence
         )
@@ -130,17 +130,21 @@ def add_chunk():
 
 @graph_routes.route('/add/entity', methods=['POST', 'GET'])
 def add_entity():
-    chunk_id, entity_id, name, text, url, entity_label = get_entity_json_value()
+    # chunk_id, entity_id, name, text, url, entity_label = get_entity_json_value()
 
-    entity = add_entity_to_chunk(
-        chunk_id,
-        entity_id,
-        name,
-        text,
-        url,
-        entity_label
-        )
-    response = respond_with_json(entity)
+    # entity = add_entity_to_chunk(
+    #     chunk_id,
+    #     entity_id,
+    #     name,
+    #     text,
+    #     url,
+    #     entity_label
+    #     )
+    # response = respond_with_json(entity)
+    entity = get_entity_json_value()
+
+    db_response = add_entity_to_chunk(entity)
+    response = respond_with_json(db_response)
     return response
 
 @graph_routes.route('/add/summary', methods=['POST', 'GET'])
@@ -208,27 +212,27 @@ def update_chunk():
             entities = entities
         else:
             entities = response["instance"]["entities"]
-        
+
         if similarity != None:
             similarity = similarity
         else:
             similarity = response["instance"]["similarity"]
-        
+
         updated_chunk = update_chunk_data(
-        chunk_id, 
+        chunk_id,
         text,
-        source_file, 
-        start_time, 
-        end_time, 
-        summaries, 
-        entities, 
-        similarity, 
+        source_file,
+        start_time,
+        end_time,
+        summaries,
+        entities,
+        similarity,
         collection_id
     )
     else:
-        print("chunk does not exist")  
-    
-    response = respond_with_json(updated_chunk)  
+        print("chunk does not exist")
+
+    response = respond_with_json(updated_chunk)
     return response
 
 

@@ -1,10 +1,26 @@
 ## config.py
 
+checkmark = f"[green]"u'\u2713 '
+cross = f"[red]"u'\u00D7 '
+eye = f"[white]"u'\u2022 '
+arrow = f"[grey]"u'\u21B3 '
+database = f"[white]DATABASE[/white]:"
+
+# %% LOGGING
+from rich import print
+from rich import pretty
+pretty.install()
+
+print (f"[bold green]Starting up.[/bold green]")
+
+print (eye, f"[bold]Loading [/bold]functions.")
 from functions import *
 
+print (eye, f"[bold]Loading [/bold]modules.")
 # %% modules
 import os
 import re
+import sys
 
 # API and requests
 from flask import *
@@ -19,39 +35,45 @@ from sklearn.metrics.pairwise import cosine_similarity
 from fuzzy_match import algorithims as algorithms
 from fuzzy_match import match
 
+print (eye, f"[bold]Loading[/bold] spacy.")
+
 # nlp libraries
 import spacy
+# %% GENERAL NLP
+text = ""
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
+nlp = spacy.load("en_core_web_sm")
+stopwords = nlp.Defaults.stop_words
 
 # maschine learning models and pipeplines
-import torch
+# print (eye, f"Loading [bold]torch[/bold].")
+# import torch
+
+print (eye, f"[bold]Loading[/bold] huggingface.")
 from transformers import pipeline, AutoModel, AutoModelForSeq2SeqLM, AutoTokenizer
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
+ner_huggingface_pipeline = pipeline("ner")
+
+print (eye, f"[bold]Loading[/bold] tensorflow.")
 import tensorflow_hub as hub
 
 # from transformers import pipeline, T5Tokenizer, T5ForConditionalGeneration, T5Config
 
 
-# %% LOGGING
-from rich import print
-from rich import pretty
-pretty.install()
-
-
 # %% DATABASE
+print (eye, f"[bold]Connecting to[/bold] graph database.")
 from py2neo import Graph
-graph = Graph(
-    "bolt://ecchr.metasphere.xyz:7687/",
-    auth=('neo4j', 'burr-query-duel-cherry')
-)
+try:
+    graph = Graph(
+        "bolt://ecchr.metasphere.xyz:7687/",
+        auth=('neo4j', 'burr-query-duel-cherry')
+    )
+except:
+    print (cross, f"Can't connect to graph database. Exiting.")
+    sys.exit(1)
+finally:
+    print (checkmark, f"Connected to graph database.")
 
 
-
-# %% GENERAL NLP
-text = ""
-nlp = spacy.load("en_core_web_sm")
-stopwords = nlp.Defaults.stop_words
-
-ner_huggingface_pipeline = pipeline("ner")
 
 # %% ENTITIY RECOGNITION
 accepted_entity_labels = (

@@ -45,14 +45,24 @@ response_disconnect = {
 
 def submit(query, parameters):
     try:
+        print (f"{query}\n")
+        print (f"{parameters}\n")
         result = graph.run(query, parameters).data()
-        result=result[0]['db_return']
-        response_success['instance']=result
-        return response_success
+        if result:
+            db_return = result[0]['db_return']
+            response_success['instance'] = db_return
+            print (f"[green]found instance: {db_return}[/green]")
+            return response_success
+        else:
+            response_failed['message'] = "instance not found"
+            response_failed['instance'] = parameters
+            print (f"[red]{response_failed['message']}[/red]")
+            return response_failed
     except:
         traceback.print_exc()
-        response_failed['message'] = "could not find instance"
-        response_failed['instance']= parameters
+        response_failed['message'] = "neo4j query failed"
+        response_failed['instance'] = parameters
+        print (f"[red]{response_failed['message']}[/red]")
         return response_failed
 
 def connect_chunk_to_chunk_submit(query, parameters):

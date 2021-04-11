@@ -3,7 +3,7 @@ from config import *
 # Configuration
 api = Flask(__name__)
 api.config["DEBUG"] = True
-api.config["SERVER_NAME"] = 'ecchr.metasphere.xyz:2342'
+# api.config["SERVER_NAME"] = 'ecchr.metasphere.xyz:2342'
 
 # Standard routes
 @api.route('/', methods=['GET', 'POST'])
