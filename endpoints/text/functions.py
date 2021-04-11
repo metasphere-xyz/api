@@ -1,5 +1,43 @@
 from config import *
 
+print(f"[bold]Loading corpus embeddings.[/bold]")
+query = '''
+    MATCH (c:Chunk)
+    RETURN c.chunk_id, c.text
+'''
+print(eye, f"Retrieving all chunks...")
+result = graph.run(query).data()
+
+documents = []
+chunk_list = []
+
+for chunks in result:
+    documents.append(chunks['c.text'])
+    chunk_list.append(chunks['c.chunk_id'])
+
+print(checkmark, f"Successfully retrieved all chunks.")
+#Load AutoModel from huggingface model repository
+print(eye, f"Loading tokenizer...")
+tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
+print(checkmark, f"Successfully loaded tokenizer.")
+print(eye, f"Loading model...")
+model = AutoModel.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
+print(checkmark, f"Successfully loaded model.")
+
+#Tokenize sentences
+print(eye, f"Tokenizing corpus...")
+encoded_input = tokenizer(documents, padding=True, truncation=True, max_length=128, return_tensors='pt')
+encoded_input_sentence = tokenizer(text, padding=True, truncation=True, max_length=128, return_tensors='pt')
+print(checkmark, f"Successfully tokenized.")
+
+#Compute token embeddings
+print(eye, f"Computing base embeddings...")
+with torch.no_grad():
+    model_output = model(**encoded_input)
+    sentence_embeddings = model_output[0][:,0]
+
+print(checkmark, f"Successfully computed {len(sentence_embeddings)} embeddings")
+
 def preprocess(text):
     return text.replace("\r", "\n ").replace("\n", " ").replace("\s\s+", " ").strip()
 
@@ -278,35 +316,23 @@ def ner_huggingface(text):
 
 # %% Text Similarity with HUGGINGFACE
 def similarity_huggingface(text, num_similar_chunks, similarity_score_treshold):
-    query = '''
-        MATCH (c:Chunk)
-        RETURN c.chunk_id, c.text
-    '''
-    result = graph.run(query).data()
 
-    documents = []
-    chunk_list = []
+    print(f"[bold]Finding similar chunks.[/bold]")
+    print(f"{text}")
 
-    for chunks in result:
-        documents.append(chunks['c.text'])
-        chunk_list.append(chunks['c.chunk_id'])
-
-    #Load AutoModel from huggingface model repository
-    tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
-    model = AutoModel.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
-
-    #Tokenize sentences
-    encoded_input = tokenizer(documents, padding=True, truncation=True, max_length=128, return_tensors='pt')
+    print(eye, f"Tokenizing...")
     encoded_input_sentence = tokenizer(text, padding=True, truncation=True, max_length=128, return_tensors='pt')
+    print(checkmark, f"Successfully tokenized.")
 
-    #Compute token embeddings
+    print(eye, f"Computing embeddings...")
     with torch.no_grad():
-        model_output = model(**encoded_input)
         sentence_output = model(**encoded_input_sentence)
-        sentence_embeddings = model_output[0][:,0]
         base_embeddings = sentence_output[0][:,0]
+    print(checkmark, f"Successfully computed embeddings.")
 
+    print(eye, f"Computing similarity...")
     scores = cosine_similarity(base_embeddings, sentence_embeddings).flatten()
+    print(checkmark, f"Successfully computed similarity.")
 
     sorted_scores_indexes = sorted(((value, index) for index, value in enumerate(scores)), reverse=True)
     print(sorted_scores_indexes)
