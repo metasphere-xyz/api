@@ -52,8 +52,8 @@ def find_summary(summary):
     return response
 
 def add_collection_with_chunks(name, source_type, source_path, date, chunk_sequence):
-    hash = hashlib.md5(name[0].encode("utf-8"))
-    collection_id = hash.hexdigest()
+    # hash = hashlib.md5(name[0].encode("utf-8"))
+    # collection_id = hash.hexdigest()
 
     chunk_ids = []
     for chunk in chunk_sequence:
@@ -73,7 +73,7 @@ def add_collection_with_chunks(name, source_type, source_path, date, chunk_seque
     '''
 
     query_2 = '''
-        CREATE(co:Collection {collection_id: $collection_id, name: $name, source_type: $source_type, source_path: $source_path, date: $date, chunk_sequence: $chunk_ids})
+        CREATE(co:Collection {collection_id: $collection_id, name: $name, source_type: $source_type, source_path: $source_path, date: $date, $intro_audio: intro_audio, $outro_audio: outro_audio, $intro_text: intro_text, $num_chunks: num_chunks, chunk_sequence: $chunk_ids})
         RETURN co as db_return
     '''
 
@@ -94,8 +94,12 @@ def add_collection_with_chunks(name, source_type, source_path, date, chunk_seque
         'name': name,
         'source_type': source_type,
         'source_path': source_path,
-        'date': date, 
-        'chunk_sequence': chunk_sequence,
+        'date': date,
+        'intro_audio': intro_audio,
+        'outro_audio': outro_audio,
+        'intro_text': intro_text,
+        'intro_text': intro_text,
+        'num_chunks': num_chunks,
         'chunk_ids': chunk_ids
     }
 

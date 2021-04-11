@@ -25,12 +25,18 @@ def get_chunk_json_value():
 
 def get_collection_json_value():
     if request_type(request) == 'application/json':
+        collection_id = request.get_json()['collection_id']
         name = request.get_json()['name']
         source_type = request.get_json()['source_type']
         source_path = request.get_json()['source_path']
         date = request.get_json()['date']
+        intro_audio = request.get_json()['intro_audio']
+        outro_audio = request.get_json()['outro_audio']
+        intro_text = request.get_json()['intro_text']
+        trigger_warning = request.get_json()['trigger_warning']
+        num_chunks = request.get_json()['num_chunks']
         chunk_sequence = request.get_json()['chunk_sequence']
-        return name, source_type, source_path, date, chunk_sequence
+        return collection_id, name, source_type, source_path, date, intro_audio, outro_audio, intro_text, trigger_warning, num_chunks, chunk_sequence
     else:
         return 'json expected'
 
