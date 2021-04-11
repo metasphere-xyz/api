@@ -73,13 +73,19 @@ def return_summary_viaGET(summary_id):
 
 @graph_routes.route('/add/collection', methods=['POST', 'GET'])
 def add_collection():
-    name, source_type, source_path, date, chunk_sequence = get_collection_json_value()
+    collection_id, name, source_type, source_path, date, intro_audio, outro_audio, intro_text, trigger_warning, num_chunks, chunk_sequence = get_collection_json_value()
 
     collection_with_chunks = add_collection_with_chunks(
+        collection_id,
         name,
         source_type,
         source_path,
         date,
+        intro_audio,
+        outro_audio,
+        intro_text,
+        trigger_warning,
+        num_chunks,
         chunk_sequence
         )
     response = respond_with_json(collection_with_chunks)
@@ -194,27 +200,27 @@ def update_chunk():
             entities = entities
         else:
             entities = response["instance"]["entities"]
-        
+
         if similarity != None:
             similarity = similarity
         else:
             similarity = response["instance"]["similarity"]
-        
+
         updated_chunk = update_chunk_data(
-        chunk_id, 
+        chunk_id,
         text,
-        source_file, 
-        start_time, 
-        end_time, 
-        summaries, 
-        entities, 
-        similarity, 
+        source_file,
+        start_time,
+        end_time,
+        summaries,
+        entities,
+        similarity,
         collection_id
     )
     else:
-        print("chunk does not exist")  
-    
-    response = respond_with_json(updated_chunk)  
+        print("chunk does not exist")
+
+    response = respond_with_json(updated_chunk)
     return response
 
 

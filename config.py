@@ -1,5 +1,12 @@
 ## config.py
 
+# %% LOGGING
+from rich import print
+from rich import pretty
+pretty.install()
+
+print (f"[bold green]Starting up...[/bold green]")
+
 from functions import *
 
 # %% modules
@@ -29,12 +36,6 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 import tensorflow_hub as hub
 
 # from transformers import pipeline, T5Tokenizer, T5ForConditionalGeneration, T5Config
-
-
-# %% LOGGING
-from rich import print
-from rich import pretty
-pretty.install()
 
 
 # %% DATABASE

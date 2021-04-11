@@ -51,13 +51,18 @@ def find_summary(summary):
     response = submit(query, parameters)
     return response
 
-def add_collection_with_chunks(name, source_type, source_path, date, chunk_sequence):
+def add_collection_with_chunks(collection_id, name, source_type, source_path, date, intro_audio, outro_audio, intro_text, trigger_warning, num_chunks, chunk_sequence):
     # hash = hashlib.md5(name[0].encode("utf-8"))
     # collection_id = hash.hexdigest()
+    print(f"[bold]Adding collection.[/bold]")
+    print(f"Number of chunks: {len(chunk_sequence)}")
 
-    chunk_ids = []
+    chunk_ids = json.dumps(chunk_sequence)
+
     for chunk in chunk_sequence:
-        chunk_ids.append(chunk['chunk_id'])
+        chunk["entities"] = json.dumps(chunk["entities"])
+        chunk["summaries"] = json.dumps(chunk["summaries"])
+
 
     query_1 = '''
         WITH $chunk_sequence AS seq
@@ -72,22 +77,17 @@ def add_collection_with_chunks(name, source_type, source_path, date, chunk_seque
         RETURN chunks as db_return
     '''
 
-    query_2 = '''
-        CREATE(co:Collection {collection_id: $collection_id, name: $name, source_type: $source_type, source_path: $source_path, date: $date, $intro_audio: intro_audio, $outro_audio: outro_audio, $intro_text: intro_text, $num_chunks: num_chunks, chunk_sequence: $chunk_ids})
-        RETURN co as db_return
-    '''
-
-    query_3 = '''
-        MATCH (c:Chunk {collection_id: $collection_id}),(co:Collection {collection_id: $collection_id})
-        WITH COLLECT(c) AS chunks, co
-        FOREACH (ch IN chunks |
-            CREATE (ch)-[:CONTAINED_IN]->(co))
-        RETURN co as db_return
-    '''
-
     parameters_1 = {
         'chunk_sequence': chunk_sequence
     }
+
+    response = submit(query_1, parameters_1)
+    print(response)
+
+    query_2 = '''
+        CREATE(co:Collection {collection_id: $collection_id, name: $name, source_type: $source_type, source_path: $source_path, date: $date, intro_audio: $intro_audio, outro_audio: $outro_audio, intro_text: $intro_text, num_chunks: $num_chunks, chunk_sequence: $chunk_ids})
+        RETURN co as db_return
+    '''
 
     parameters_2 = {
         'collection_id': collection_id,
@@ -103,13 +103,23 @@ def add_collection_with_chunks(name, source_type, source_path, date, chunk_seque
         'chunk_ids': chunk_ids
     }
 
+    response = submit(query_2, parameters_2)
+    print(response)
+
+    query_3 = '''
+        MATCH (c:Chunk {collection_id: $collection_id}),(co:Collection {collection_id: $collection_id})
+        WITH COLLECT(c) AS chunks, co
+        FOREACH (ch IN chunks |
+            CREATE (ch)-[:CONTAINED_IN]->(co))
+        RETURN co as db_return
+    '''
+
     parameters_3 = {
         'collection_id': collection_id
     }
 
-    submit(query_1, parameters_1)
-    submit(query_2, parameters_2)
     response = submit(query_3, parameters_3)
+    print (response)
     return response
 
 def add_collection_without_chunks(name, source_type, source_path, date, chunk_sequence):
