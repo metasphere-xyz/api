@@ -62,7 +62,7 @@ def add_collection_with_chunks(collection_id, name, source_type, source_path, da
     for chunk in chunk_sequence:
         chunk["entities"] = json.dumps(chunk["entities"])
         chunk["summaries"] = json.dumps(chunk["summaries"])
-
+        chunk["similarity"] = json.dumps(chunk["similarity"])
 
     query_1 = '''
         WITH $chunk_sequence AS seq
@@ -82,7 +82,6 @@ def add_collection_with_chunks(collection_id, name, source_type, source_path, da
     }
 
     response = submit(query_1, parameters_1)
-    print(response)
 
     query_2 = '''
         CREATE(co:Collection {collection_id: $collection_id, name: $name, source_type: $source_type, source_path: $source_path, date: $date, intro_audio: $intro_audio, outro_audio: $outro_audio, intro_text: $intro_text, num_chunks: $num_chunks, chunk_sequence: $chunk_ids})
@@ -104,7 +103,6 @@ def add_collection_with_chunks(collection_id, name, source_type, source_path, da
     }
 
     response = submit(query_2, parameters_2)
-    print(response)
 
     query_3 = '''
         MATCH (c:Chunk {collection_id: $collection_id}),(co:Collection {collection_id: $collection_id})
@@ -119,7 +117,6 @@ def add_collection_with_chunks(collection_id, name, source_type, source_path, da
     }
 
     response = submit(query_3, parameters_3)
-    print (response)
     return response
 
 def add_collection_without_chunks(name, source_type, source_path, date, chunk_sequence):
@@ -147,7 +144,7 @@ def add_chunk_to_collection(text, source_file, start_time, end_time, summaries, 
 
     query_2 = '''
         MATCH(co:Collection {collection_id: $collection_id}),(c:Chunk {chunk_id: $chunk_id})
-        CREATE (c)-[:CONTAINED_IN]->(co)
+        CREATE (co)-[:CONTAINS]->(c)
     '''
 
     parameters_1 = {
@@ -217,20 +214,29 @@ def add_unwrap_chunk_to_collection(text, source_file, start_time, end_time, summ
     submit(query_3, parameters_3)
     return response
 
-def add_entity_to_chunk(chunk_id, name, url, entity_label):
+def add_entity_to_chunk(entity):
     query = '''
-        CREATE (e:Entity:ORG {name: $name, url: $url})
-        SET e:$entity_label
+        CREATE (e:Entity:ORG {entity_id: $entity_id, name: $name, url: $url, text: $text})
+        SET e: $entity_label
         WITH e
         MATCH (c:Chunk {chunk_id: $chunk_id})
         CREATE (c)-[:MENTIONS]->(e)
         RETURN e as db_return
     '''
+
+    # parameters = {
+    #     'chunk_id': chunk_id,
+    #     'name': name,
+    #     'url': url,
+    #     'entity_label': entity_label
+    # }
     parameters = {
-        'chunk_id': chunk_id,
-        'name': name,
-        'url': url,
-        'entity_label': entity_label
+        "name": entity["name"],
+        "entity_label": entity["entity_label"],
+        "entity_id": entity["entity_id"],
+        "url": entity["url"],
+        "text": entity["text"],
+        "chunk_id": entity["chunk_id"]
     }
     response = submit(query, parameters)
     return response

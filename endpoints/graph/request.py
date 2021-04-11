@@ -42,11 +42,23 @@ def get_collection_json_value():
 
 def get_entity_json_value():
     if request_type(request) == 'application/json':
-        chunk_id = request.get_json()['chunk_id']
-        name = request.get_json()['name']
-        url = request.get_json()['url']
-        entity_label = request.get_json()['entity_label']
-        return chunk_id, name, url, entity_label
+        try:
+            values_from_json = json.loads(str(json.dumps(request.get_json())))
+        except:
+            return 'could not unpack json'
+        finally:
+            return values_from_json
+    else:
+        return 'json expected'
+
+def parse_json_from_request():
+    if request_type(request) == 'application/json':
+        try:
+            values_from_json = json.loads(str(json.dumps(request.get_json())))
+        except:
+            return 'could not unpack json'
+        finally:
+            return values_from_json
     else:
         return 'json expected'
 

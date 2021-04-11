@@ -124,15 +124,10 @@ def add_chunk():
 
 @graph_routes.route('/add/entity', methods=['POST', 'GET'])
 def add_entity():
-    chunk_id, name, url, entity_label = get_entity_json_value()
+    entity = get_entity_json_value()
 
-    entity = add_entity_to_chunk(
-        chunk_id,
-        name,
-        url,
-        entity_label
-        )
-    response = respond_with_json(entity)
+    db_response = add_entity_to_chunk(entity)
+    response = respond_with_json(db_response)
     return response
 
 @graph_routes.route('/add/summary', methods=['POST', 'GET'])
