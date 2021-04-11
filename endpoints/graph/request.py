@@ -39,8 +39,8 @@ def get_entity_json_value():
         chunk_id = request.get_json()['chunk_id']
         name = request.get_json()['name']
         url = request.get_json()['url']
-        entity_category = request.get_json()['entity_category']
-        return chunk_id, name, url, entity_category
+        entity_label = request.get_json()['entity_label']
+        return chunk_id, name, url, entity_label
     else:
         return 'json expected'
 

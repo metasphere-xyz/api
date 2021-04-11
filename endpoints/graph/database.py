@@ -203,10 +203,10 @@ def add_unwrap_chunk_to_collection(text, source_file, start_time, end_time, summ
     submit(query_3, parameters_3)
     return response
 
-def add_entity_to_chunk(chunk_id, name, url, entity_category):
+def add_entity_to_chunk(chunk_id, name, url, entity_label):
     query = '''
         CREATE (e:Entity:ORG {name: $name, url: $url})
-        SET e:$entity_category
+        SET e:$entity_label
         WITH e
         MATCH (c:Chunk {chunk_id: $chunk_id})
         CREATE (c)-[:MENTIONS]->(e)
@@ -216,7 +216,7 @@ def add_entity_to_chunk(chunk_id, name, url, entity_category):
         'chunk_id': chunk_id,
         'name': name,
         'url': url,
-        'entity_category': entity_category
+        'entity_label': entity_label
     }
     response = submit(query, parameters)
     return response
