@@ -235,7 +235,7 @@ def add_unwrap_chunk_to_collection(text, source_file, start_time, end_time, summ
 # def add_entity_to_chunk(chunk_id, entity_id, name, text, url, entity_label):
 def add_entity_to_chunk(entity):
     query = '''
-        CREATE (e:Entity {entity_id: $entity_id, chunk_id: $chunk_id, name: $name, text: $text, url: $url})
+        CREATE (e:Entity {entity_id: $entity_id, name: $name, text: $text, url: $url})
         WITH e
         CALL apoc.create.addLabels(e, $entity_label) YIELD node
         WITH e
