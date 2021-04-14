@@ -30,6 +30,7 @@ print(eye, f"Retrieving all chunks...")
 result = graph.run(query).data()
 
 documents = []
+documents_clean = []
 chunk_list = []
 length_corpus = 0
 num_chunks = len(result)
@@ -40,7 +41,8 @@ if len(result) > 1:
         chunk_text = preprocess(chunk['c.text'])
         chunk_text_clean = remove_stopwords_from_string(chunk_text)
         length_corpus += 1
-        documents.append(chunk_text_clean)
+        documents.append(chunk_text)
+        documents_clean.append(chunk_text_clean)
         chunk_list.append(chunk['c.chunk_id'])
 
 print(checkmark, f"Successfully processed {length_corpus}/{num_chunks} chunks.")
@@ -55,7 +57,7 @@ print(checkmark, f"Successfully loaded model.")
 #Tokenize sentences
 print(eye, f"Tokenizing corpus...")
 if length_corpus > 1:
-    encoded_input = tokenizer(documents, padding=True, truncation=True, max_length=128, return_tensors='pt')
+    encoded_input = tokenizer(documents_clean, padding=True, truncation=True, max_length=128, return_tensors='pt')
 else:
     encoded_input = tokenizer([""], padding=True, truncation=True, max_length=128, return_tensors='pt')
 
@@ -384,7 +386,7 @@ def similarity_huggingface(text, num_similar_chunks, similarity_score_treshold):
         chunk_id = chunk_list[index]
         chunk_text = documents[index]
         score = int(round(sorted_scores_indexes[i][0],2)*100)
-        if 100 > score >= int(similarity_score_treshold):
+        if 98 > score >= int(similarity_score_treshold):
             response_similarity['similar_chunks'].append(
                 {
                     "chunk_id": chunk_id,
@@ -392,4 +394,5 @@ def similarity_huggingface(text, num_similar_chunks, similarity_score_treshold):
                     "text": chunk_text
                 }
             )
+    print(response_similarity)
     return response_similarity

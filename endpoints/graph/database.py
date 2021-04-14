@@ -327,7 +327,7 @@ def update_chunk_data(chunk_id, text, source_file, start_time, end_time, summari
 
 def connect_chunk_to_chunk(connect, with_id, with_score):
     # TODO: check if chunks are already connected
-    if chunk_id != with_id:
+    if connect != with_id:
         query = '''
             MATCH(n1 {chunk_id: $start_id}),(n2 {chunk_id: $end_id})
             CREATE (n1)-[w:SIMILARITY {similarity: $similarity}]->(n2)

@@ -71,14 +71,16 @@ def connect_chunk_to_chunk_submit(query, parameters):
         start_chunk = result[0]['n1']
         end_chunk = result[0]['n2']
         similarity = result[0]['similarity']
+        response_connect['status'] = "success"
         response_connect['connected'] = start_chunk
         response_connect['with']['node'] = end_chunk
         response_connect['with']['score'] = similarity
         return response_connect
     except:
         traceback.print_exc()
+        response_failed['status'] = "failed"
         response_failed['message'] = "could not create connection (" + str(404) + ")"
-        response_failed['instance']= parameters
+        response_failed['instance'] = parameters
         return response_failed
 
 def connect_entity_to_chunk_submit(query, parameters):
