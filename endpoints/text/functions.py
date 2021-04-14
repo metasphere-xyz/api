@@ -21,56 +21,58 @@ def remove_stopwords_from_string(text):
     return text_clean
 
 
-print(f"[bold]Loading corpus embeddings.[/bold]")
-query = '''
-    MATCH (c:Chunk)
-    RETURN c.chunk_id, c.text
-'''
-print(eye, f"Retrieving all chunks...")
-result = graph.run(query).data()
+def compute_base_embeddings():
+    print(f"[bold]Loading corpus embeddings.[/bold]")
+    query = '''
+        MATCH (c:Chunk)
+        RETURN c.chunk_id, c.text
+    '''
+    print(eye, f"Retrieving all chunks...")
+    result = graph.run(query).data()
 
-documents = []
-documents_clean = []
-chunk_list = []
-length_corpus = 0
-num_chunks = len(result)
-print(checkmark, f"Successfully loaded {num_chunks} chunks.")
+    documents = []
+    documents_clean = []
+    chunk_list = []
+    length_corpus = 0
+    num_chunks = len(result)
+    print(checkmark, f"Successfully loaded {num_chunks} chunks.")
 
-if len(result) > 1:
-    for chunk in result:
-        chunk_text = preprocess(chunk['c.text'])
-        chunk_text_clean = remove_stopwords_from_string(chunk_text)
-        length_corpus += 1
-        documents.append(chunk_text)
-        documents_clean.append(chunk_text_clean)
-        chunk_list.append(chunk['c.chunk_id'])
+    if len(result) > 1:
+        for chunk in result:
+            chunk_text = preprocess(chunk['c.text'])
+            chunk_text_clean = remove_stopwords_from_string(chunk_text)
+            length_corpus += 1
+            documents.append(chunk_text)
+            documents_clean.append(chunk_text_clean)
+            chunk_list.append(chunk['c.chunk_id'])
 
-print(checkmark, f"Successfully processed {length_corpus}/{num_chunks} chunks.")
-#Load AutoModel from huggingface model repository
-print(eye, f"Loading tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
-print(checkmark, f"Successfully loaded tokenizer.")
-print(eye, f"Loading model...")
-model = AutoModel.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
-print(checkmark, f"Successfully loaded model.")
+    print(checkmark, f"Successfully processed {length_corpus}/{num_chunks} chunks.")
+    #Load AutoModel from huggingface model repository
+    print(eye, f"Loading tokenizer...")
+    tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
+    print(checkmark, f"Successfully loaded tokenizer.")
+    print(eye, f"Loading model...")
+    model = AutoModel.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
+    print(checkmark, f"Successfully loaded model.")
 
-#Tokenize sentences
-print(eye, f"Tokenizing corpus...")
-if length_corpus > 1:
-    encoded_input = tokenizer(documents_clean, padding=True, truncation=True, max_length=128, return_tensors='pt')
-else:
-    encoded_input = tokenizer([""], padding=True, truncation=True, max_length=128, return_tensors='pt')
+    #Tokenize sentences
+    print(eye, f"Tokenizing corpus...")
+    if length_corpus > 1:
+        encoded_input = tokenizer(documents_clean, padding=True, truncation=True, max_length=128, return_tensors='pt')
+    else:
+        encoded_input = tokenizer([""], padding=True, truncation=True, max_length=128, return_tensors='pt')
 
-# encoded_input_sentence = tokenizer(text, padding=True, truncation=True, max_length=128, return_tensors='pt')
-print(checkmark, f"Successfully tokenized.")
+    # encoded_input_sentence = tokenizer(text, padding=True, truncation=True, max_length=128, return_tensors='pt')
+    print(checkmark, f"Successfully tokenized.")
 
-#Compute token embeddings
-print(eye, f"Computing base embeddings...")
-with torch.no_grad():
-    model_output = model(**encoded_input)
-    sentence_embeddings = model_output[0][:,0]
+    #Compute token embeddings
+    print(eye, f"Computing base embeddings...")
+    with torch.no_grad():
+        model_output = model(**encoded_input)
+        sentence_embeddings = model_output[0][:,0]
 
-print(checkmark, f"Successfully computed {len(sentence_embeddings)} embeddings")
+    print(checkmark, f"Successfully computed {len(sentence_embeddings)} embeddings")
+    return documents, tokenizer, model, sentence_embeddings
 
 def summarizer_pipeline(text, min_length, max_length):
     summarizer = pipeline(
