@@ -385,20 +385,43 @@ def connect_entity_to_chunk(connect, with_id):
 
 def connect_resources(resource):
     query_1 = '''
-        MATCH(re:Resource {resource_id: $resource_id})<-[r:REFERENCES]-(c:Chunk {chunk_id: $chunk_id})
+        MATCH(re:Resource {resource_id: $resource_id})<-[r:REFERENCES]-(c:Chunk {chunk_id: $id})
         RETURN re as db_return
     '''
     parameters = {
         'resource_id': resource["connect"],
-        'chunk_id': resource["with"]["id"]
+        'id': resource["with"]["id"]
     }
     response_exist = submit_resource_exist(query_1, parameters)
     print(response_exist)
 
     if response_exist["status"] == "failed":
         query_2 = '''
-            MATCH(re:Resource {resource_id: $resource_id}),(c:Chunk {chunk_id: $chunk_id})
-            CREATE (re)<-[r:REFERENCES]-(c)
+            MATCH(re:Resource {resource_id: $resource_id}),(c:Chunk {chunk_id: $id})
+            CREATE (re)<-[:REFERENCES]-(c)
+            RETURN re as db_return
+        '''
+        response = submit(query_2, parameters)
+        return response
+    else: 
+        return response_exist
+
+def connect_resources_via_name(resource):
+    query_1 = '''
+        MATCH(re:Resource {resource_id: $resource_id})<-[r:REFERENCES]-(n{name: $name})
+        RETURN re as db_return
+    '''
+    parameters = {
+        'resource_id': resource["connect"],
+        'name': resource["with"]["name"]
+    }
+    response_exist = submit_resource_exist(query_1, parameters)
+    print(response_exist)
+
+    if response_exist["status"] == "failed":
+        query_2 = '''
+            MATCH(re:Resource {resource_id: $resource_id}),(n {name: $name})
+            CREATE (re)<-[:REFERENCES]-(n)
             RETURN re as db_return
         '''
         response = submit(query_2, parameters)

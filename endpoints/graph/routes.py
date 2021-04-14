@@ -264,6 +264,14 @@ def connect_resource():
     response = respond_with_json(connected_resource)
     return response
 
+@graph_routes.route('/connect/resource_name', methods=['POST', 'GET'])
+def connect_resource_name():
+    resource = parse_json_from_request()
+
+    connected_resource = connect_resources_via_name(resource)
+    response = respond_with_json(connected_resource)
+    return response
+
 @graph_routes.route('/connect/entity', methods=['POST', 'GET'])
 def connect_entity():
     connect, with_id = connect_entity_json_value()
