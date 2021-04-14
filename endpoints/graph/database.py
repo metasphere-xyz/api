@@ -1,5 +1,5 @@
 from config import *
-from endpoints.graph.response import submit
+from endpoints.graph.response import *
 
 def find_node(search):
     query = '''
@@ -234,13 +234,22 @@ def add_unwrap_chunk_to_collection(text, source_file, start_time, end_time, summ
 
 # def add_entity_to_chunk(chunk_id, entity_id, name, text, url, entity_label):
 def add_entity_to_chunk(entity):
+    # query = '''
+    #     CREATE (e:Entity {entity_id: $entity_id, name: $name, text: $text, url: $url})
+    #     WITH e
+    #     CALL apoc.create.addLabels(e, $entity_label) YIELD node
+    #     WITH e
+    #     MATCH (c:Chunk {chunk_id: $chunk_id})
+    #     CREATE (c)-[:MENTIONS]->(e)
+    #     RETURN e as db_return
+    # '''
+
     query = '''
         CREATE (e:Entity {entity_id: $entity_id, name: $name, text: $text, url: $url})
         WITH e
         CALL apoc.create.addLabels(e, $entity_label) YIELD node
         WITH e
         MATCH (c:Chunk {chunk_id: $chunk_id})
-        CREATE (c)-[:MENTIONS]->(e)
         RETURN e as db_return
     '''
 
@@ -317,19 +326,21 @@ def update_chunk_data(chunk_id, text, source_file, start_time, end_time, summari
     return response
 
 def connect_chunk_to_chunk(connect, with_id, with_score):
-    query = '''
-        MATCH(n1 {chunk_id: $start_id}),(n2 {chunk_id: $end_id})
-        CREATE (n1)-[w:SIMILARITY {similarity: $similarity}]->(n2)
-        RETURN n1, n2, w.similarity as similarity
-    '''
-    parameters={
-        'start_id': connect,
-        'end_id': with_id,
-        'similarity': with_score
-    }
+    # TODO: check if chunks are already connected
+    if chunk_id != with_id:
+        query = '''
+            MATCH(n1 {chunk_id: $start_id}),(n2 {chunk_id: $end_id})
+            CREATE (n1)-[w:SIMILARITY {similarity: $similarity}]->(n2)
+            RETURN n1, n2, w.similarity as similarity
+        '''
+        parameters = {
+            'start_id': connect,
+            'end_id': with_id,
+            'similarity': with_score
+        }
 
-    response = connect_chunk_to_chunk_submit(query, parameters)
-    return response
+        response = connect_chunk_to_chunk_submit(query, parameters)
+        return response
 
 def connect_entity_to_chunk(connect, with_id):
     query = '''
@@ -337,7 +348,7 @@ def connect_entity_to_chunk(connect, with_id):
         CREATE (e)<-[w:MENTIONS]-(c)
         RETURN c, e
     '''
-    parameters={
+    parameters = {
         'entity_id': connect,
         'chunk_id': with_id
     }

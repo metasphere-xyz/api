@@ -46,8 +46,8 @@ nlp = spacy.load("en_core_web_sm")
 stopwords = nlp.Defaults.stop_words
 
 # maschine learning models and pipeplines
-# print (eye, f"Loading [bold]torch[/bold].")
-# import torch
+print (eye, f"Loading [bold]torch[/bold].")
+import torch
 
 print (eye, f"[bold]Loading[/bold] huggingface.")
 from transformers import pipeline, AutoModel, AutoModelForSeq2SeqLM, AutoTokenizer

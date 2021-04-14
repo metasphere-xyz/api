@@ -1,5 +1,26 @@
 from config import *
 
+def preprocess(text):
+    text_clean = text.replace("\r", "\n ")\
+        .replace("\n", " ") \
+        .replace("\s\s+", " ") \
+        .replace('"', '') \
+        .replace("’s", "") \
+        .replace("...", "") \
+        .replace('" ', "") \
+        .replace('"', "") \
+        .replace(" - ", "-") \
+        .strip()
+    return text_clean
+
+def remove_stopwords_from_string(text):
+    text_clean = ''
+    for word in text.lower().split():
+        if word not in stopwords:
+            text_clean += word + " "
+    return text_clean
+
+
 print(f"[bold]Loading corpus embeddings.[/bold]")
 query = '''
     MATCH (c:Chunk)
@@ -10,12 +31,19 @@ result = graph.run(query).data()
 
 documents = []
 chunk_list = []
+length_corpus = 0
+num_chunks = len(result)
+print(checkmark, f"Successfully loaded {num_chunks} chunks.")
 
-for chunks in result:
-    documents.append(chunks['c.text'])
-    chunk_list.append(chunks['c.chunk_id'])
+if len(result) > 1:
+    for chunk in result:
+        chunk_text = preprocess(chunk['c.text'])
+        chunk_text_clean = remove_stopwords_from_string(chunk_text)
+        length_corpus += 1
+        documents.append(chunk_text_clean)
+        chunk_list.append(chunk['c.chunk_id'])
 
-print(checkmark, f"Successfully retrieved all chunks.")
+print(checkmark, f"Successfully processed {length_corpus}/{num_chunks} chunks.")
 #Load AutoModel from huggingface model repository
 print(eye, f"Loading tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
@@ -26,8 +54,12 @@ print(checkmark, f"Successfully loaded model.")
 
 #Tokenize sentences
 print(eye, f"Tokenizing corpus...")
-encoded_input = tokenizer(documents, padding=True, truncation=True, max_length=128, return_tensors='pt')
-encoded_input_sentence = tokenizer(text, padding=True, truncation=True, max_length=128, return_tensors='pt')
+if length_corpus > 1:
+    encoded_input = tokenizer(documents, padding=True, truncation=True, max_length=128, return_tensors='pt')
+else:
+    encoded_input = tokenizer([""], padding=True, truncation=True, max_length=128, return_tensors='pt')
+
+# encoded_input_sentence = tokenizer(text, padding=True, truncation=True, max_length=128, return_tensors='pt')
 print(checkmark, f"Successfully tokenized.")
 
 #Compute token embeddings
@@ -37,9 +69,6 @@ with torch.no_grad():
     sentence_embeddings = model_output[0][:,0]
 
 print(checkmark, f"Successfully computed {len(sentence_embeddings)} embeddings")
-
-def preprocess(text):
-    return text.replace("\r", "\n ").replace("\n", " ").replace("\s\s+", " ").strip()
 
 def summarizer_pipeline(text, min_length, max_length):
     summarizer = pipeline(
@@ -321,7 +350,9 @@ def similarity_huggingface(text, num_similar_chunks, similarity_score_treshold):
     print(f"{text}")
 
     print(eye, f"Tokenizing...")
-    encoded_input_sentence = tokenizer(text, padding=True, truncation=True, max_length=128, return_tensors='pt')
+    text_without_stopwords = remove_stopwords_from_string(text)
+    print(text_without_stopwords)
+    encoded_input_sentence = tokenizer(text_without_stopwords, padding=True, truncation=True, max_length=128, return_tensors='pt')
     print(checkmark, f"Successfully tokenized.")
 
     print(eye, f"Computing embeddings...")
