@@ -147,6 +147,14 @@ def add_entity():
     response = respond_with_json(db_response)
     return response
 
+@graph_routes.route('/add/resource', methods=['POST', 'GET'])
+def add_resource():
+    resource = parse_json_from_request()
+
+    db_response = add_resource_to_db(resource)
+    response = respond_with_json(db_response)
+    return response
+
 @graph_routes.route('/add/summary', methods=['POST', 'GET'])
 def add_summary():
     chunk_id, summary_id, text, compression, aim, deviation = get_summary_json_value()
@@ -246,6 +254,14 @@ def connect_chunk():
         with_score
     )
     response = respond_with_json(connected_nodes)
+    return response
+
+@graph_routes.route('/connect/resource', methods=['POST', 'GET'])
+def connect_resource():
+    resource = parse_json_from_request()
+
+    connected_resource = connect_resources(resource)
+    response = respond_with_json(connected_resource)
     return response
 
 @graph_routes.route('/connect/entity', methods=['POST', 'GET'])

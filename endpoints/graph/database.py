@@ -277,6 +277,21 @@ def add_entity_to_chunk(entity):
     response = submit(query, parameters)
     return response
 
+def add_resource_to_db(resource):
+    query = '''
+        CREATE (r:Resource {resource_type: $resource_type, url: $url, resource_id: $resource_id, name: $name, description: $description })
+        RETURN r as db_return
+    '''
+    parameters = {
+        'resource_type': resource["resource_type"],
+        'url': resource["url"],
+        'resource_id': resource["resource_id"],
+        'name': resource["name"],
+        'description': resource["description"]
+    }
+    response = submit(query, parameters)
+    return response
+
 def add_summary_to_chunk(chunk_id, summary_id, text, compression, aim, deviation):
     query = '''
         CREATE (s:Summary {summary_id: $summary_id, text: $text, compression: $compression, aim: $aim, deviation: $deviation})
@@ -353,6 +368,19 @@ def connect_entity_to_chunk(connect, with_id):
         'chunk_id': with_id
     }
     response = connect_entity_to_chunk_submit(query, parameters)
+    return response
+
+def connect_resources(resource):
+    query = '''
+        MATCH(re:Resource {resource_id: $resource_id}),(c:Chunk {chunk_id: $chunk_id})
+        CREATE (re)<-[r:REFERENCES]-(c)
+        RETURN re as db_return
+    '''
+    parameters = {
+        'resource_id': resource["connect"],
+        'chunk_id': resource["with"]["id"]
+    }
+    response = submit(query, parameters)
     return response
 
 def disconnect_chunk_from_chunk(disconnect, from_id):
