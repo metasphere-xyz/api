@@ -61,10 +61,12 @@ def get_entity_json_value():
 def parse_json_from_request():
     if request_type(request) == 'application/json':
         try:
-            values_from_json = json.loads(str(json.dumps(request.get_json())))
+            # make sure we get json in the first place
+            request_json = request.get_json()
         except:
             return 'could not unpack json'
         finally:
+            values_from_json = json.loads(str(json.dumps(request.get_json())))
             return values_from_json
     else:
         return 'json expected'
