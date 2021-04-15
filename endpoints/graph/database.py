@@ -406,25 +406,28 @@ def connect_entity_to_chunk(connect, with_id):
 
 def connect_resources(resource):
     query_1 = '''
-        MATCH(re:Resource {resource_id: $resource_id})<-[r:REFERENCES]-(c:Chunk {chunk_id: $id})
+        MATCH (re:Resource {resource_id: $resource_id})<-[r:REFERENCES]-(c:Chunk {chunk_id: $chunk_id})
         RETURN re as db_return
     '''
     parameters = {
         'resource_id': resource["connect"],
-        'id': resource["with"]["id"]
+        'chunk_id': resource["with"]["id"]
     }
     response_exist = submit_resource_exist(query_1, parameters)
-    print(response_exist)
 
     if response_exist["status"] == "failed":
+        resource_id = parameters["resource_id"]
+        chunk_id = parameters["chunk_id"]
+        print(f"Creating relation {resource_id} -> {chunk_id}")
         query_2 = '''
-            MATCH(re:Resource {resource_id: $resource_id}),(c:Chunk {chunk_id: $id})
+            MATCH (re:Resource {resource_id: $resource_id}), (c:Chunk {chunk_id: $chunk_id})
             CREATE (re)<-[:REFERENCES]-(c)
             RETURN re as db_return
         '''
         response = submit(query_2, parameters)
+        print(response)
         return response
-    else: 
+    else:
         return response_exist
 
 def connect_resources_via_name(resource):
@@ -447,7 +450,7 @@ def connect_resources_via_name(resource):
         '''
         response = submit(query_2, parameters)
         return response
-    else: 
+    else:
         return response_exist
 
 def disconnect_chunk_from_chunk(disconnect, from_id):

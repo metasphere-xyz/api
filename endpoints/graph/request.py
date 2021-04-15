@@ -66,7 +66,7 @@ def parse_json_from_request():
         except:
             return 'could not unpack json'
         finally:
-            values_from_json = json.loads(str(json.dumps(request.get_json())))
+            values_from_json = json.loads(str(json.dumps(request_json)))
             return values_from_json
     else:
         return 'json expected'
