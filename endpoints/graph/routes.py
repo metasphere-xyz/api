@@ -243,6 +243,42 @@ def update_chunk():
     response = respond_with_json(updated_chunk)
     return response
 
+@graph_routes.route('/update/entity', methods=['POST', 'GET'])
+def update_entity():
+    entity = parse_json_from_request()
+
+    # optionalParameter(chunk_id, source_file, start_time, end_time, summaries, entities, similarity)
+
+    response = find_entity(entity["entity_id"])
+    if response["status"]=="success":
+        print("entity was found")
+        if entity["name"] != None:
+            name = entity["name"]
+        else:
+            name = response["instance"]["name"]
+        
+        if entity["url"] != None:
+            url = entity["url"]
+        else:
+            url = response["instance"]["url"]
+        
+        if entity["text"] != None:
+            text = entity["text"]
+        else:
+            text = response["instance"]["text"]
+
+        updated_entity = update_entity_data(
+            entity["entity_id"],
+            name,
+            url,
+            text
+        )
+    else:
+        print("entity does not exist")
+
+    response = respond_with_json(updated_entity)
+    return response
+
 
 @graph_routes.route('/connect/chunk', methods=['POST', 'GET'])
 def connect_chunk():

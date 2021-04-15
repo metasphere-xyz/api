@@ -353,6 +353,27 @@ def update_chunk_data(chunk_id, text, source_file, start_time, end_time, summari
     response = submit(query, parameters)
     return response
 
+
+def update_entity_data(entity_id, name, url, text):
+    query = '''
+        MATCH (e:Entity {entity_id: $entity_id})
+
+        SET e.text = $text,
+        e.name = $name,
+        e.url = $url,
+        e.text = $text
+        RETURN e as db_return
+    '''
+    parameters={
+        'entity_id': entity_id,
+        'name': name,
+        'url': url,
+        'text': text,
+    }
+
+    response = submit(query, parameters)
+    return response
+
 def connect_chunk_to_chunk(connect, with_id, with_score):
     # TODO: check if chunks are already connected
     if connect != with_id:
