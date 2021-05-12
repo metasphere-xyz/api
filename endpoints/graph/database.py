@@ -1,5 +1,6 @@
 from config import *
 from endpoints.graph.response import *
+from datetime import datetime
 
 def find_node(search):
     query = '''
@@ -480,20 +481,20 @@ def disconnect_entity_from_chunk(disconnect, from_id):
     return response
 
 def extract_metadata_from_url(url):
-    print(url)
+    now = datetime.now()
+    date_time = now.strftime("%d/%m/%Y, %H:%M:%S")
     preview = link_preview(url['url'])
-    print("title:", preview.title)
-    print("description:", preview.description)
-    print("image:", preview.image)
     
     query = '''
-        CREATE (m:Meta {title: $title, description: $description, image: $image})
-        RETURN m as db_return
+        CREATE (u:urlPreview {title: $title, description: $description, image: $image, timestamp: $timestamp, url: $url})
+        RETURN u as db_return
     '''
     parameters = {
         'title': preview.title,
         'description': preview.description,
-        'image': preview.image
+        'image': preview.image,
+        'timestamp': date_time,
+        'url': url['url']
     }
     response = submit(query, parameters)
     return response
