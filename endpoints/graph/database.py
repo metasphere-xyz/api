@@ -478,3 +478,22 @@ def disconnect_entity_from_chunk(disconnect, from_id):
     }
     response = disconnect_entity_from_chunk_submit(query, parameters)
     return response
+
+def extract_metadata_from_url(url):
+    print(url)
+    preview = link_preview(url['url'])
+    print("title:", preview.title)
+    print("description:", preview.description)
+    print("image:", preview.image)
+    
+    query = '''
+        CREATE (m:Meta {title: $title, description: $description, image: $image})
+        RETURN m as db_return
+    '''
+    parameters = {
+        'title': preview.title,
+        'description': preview.description,
+        'image': preview.image
+    }
+    response = submit(query, parameters)
+    return response

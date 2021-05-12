@@ -37,6 +37,9 @@ from fuzzy_match import match
 
 print (eye, f"[bold]Loading[/bold] spacy.")
 
+# linkpreview
+from linkpreview import link_preview
+
 # nlp libraries
 import spacy
 # %% GENERAL NLP

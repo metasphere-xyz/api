@@ -341,6 +341,14 @@ def disconnect_entity():
     response = respond_with_json(disconnected_nodes)
     return response
 
+@graph_routes.route('/extract/metadata', methods=['POST', 'GET'])
+def extract_metadata():
+    url = parse_json_from_request()
+
+    extracted_metadata = extract_metadata_from_url(url)
+    response = respond_with_json(extracted_metadata)
+    return response
+
 
 # TODO: add missing endpoints:
 #
