@@ -480,21 +480,20 @@ def disconnect_entity_from_chunk(disconnect, from_id):
     response = disconnect_entity_from_chunk_submit(query, parameters)
     return response
 
-def extract_metadata_from_url(url):
+def extract_metadata_from_url(url_metadata):
     now = datetime.now()
     date_time = now.strftime("%d/%m/%Y, %H:%M:%S")
-    preview = link_preview(url['url'])
     
     query = '''
         CREATE (u:urlPreview {title: $title, description: $description, image: $image, timestamp: $timestamp, url: $url})
         RETURN u as db_return
     '''
     parameters = {
-        'title': preview.title,
-        'description': preview.description,
-        'image': preview.image,
+        'title': url_metadata['title'],
+        'description': url_metadata['description'],
+        'image': url_metadata['image'],
         'timestamp': date_time,
-        'url': url['url']
+        'url': url_metadata['url']
     }
     response = submit(query, parameters)
     return response

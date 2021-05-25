@@ -341,11 +341,20 @@ def disconnect_entity():
     response = respond_with_json(disconnected_nodes)
     return response
 
-@graph_routes.route('/extract/metadata', methods=['POST', 'GET'])
+@graph_routes.route('/add/urlpreview', methods=['POST', 'GET'])
 def extract_metadata():
-    url = parse_json_from_request()
-
-    extracted_metadata = extract_metadata_from_url(url)
+    query = parse_json_from_request()
+    api_base_url = "http://127.0.0.1:5000"
+    urlpreview_endpoint = api_base_url + "/text/extract/urlpreview"
+    response = requests.post(
+                urlpreview_endpoint,
+                data=json.dumps(query),
+                headers={
+                    'Content-type': 'application/json'
+                }
+            )
+    print(response.json())
+    extracted_metadata = extract_metadata_from_url(response.json())
     response = respond_with_json(extracted_metadata)
     return response
 

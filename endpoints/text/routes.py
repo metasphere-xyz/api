@@ -15,6 +15,14 @@ def return_ner():
     response = respond_with_json(ner_output)
     return response
 
+
+@text_routes.route('/extract/urlpreview', methods=['POST', 'GET'])
+def return_urlpreview():
+    url = parse_json_from_request()
+    preview = url_preview(url['url'])
+    response = respond_with_json(preview)
+    return response
+
 @text_routes.route('/similarities', methods=['POST', 'GET'])
 def return_similarities():
     (text, num_similar_chunks, similarity_score_treshold) = parse_json('similarity')
@@ -49,6 +57,7 @@ def return_summaries():
         num_summaries,
         response_type
     )
+
 
 # TODO: wrap request generation into function to get rid of repeating code
 # TODO: bugfixing

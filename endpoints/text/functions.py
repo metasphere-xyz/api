@@ -20,6 +20,16 @@ def remove_stopwords_from_string(text):
             text_clean += word + " "
     return text_clean
 
+def url_preview(url):
+    preview = link_preview(url)
+
+    response_urlpreview = {
+        "url": url,
+        "title": preview.title,
+        "description": preview.description,
+        "image": preview.image,
+    }
+    return response_urlpreview
 
 def compute_base_embeddings():
     print(f"[bold]Loading corpus embeddings.[/bold]")

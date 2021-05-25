@@ -23,6 +23,7 @@ import re
 import sys
 
 # API and requests
+import requests
 from flask import *
 import json
 from http import HTTPStatus
