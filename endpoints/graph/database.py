@@ -52,6 +52,16 @@ def find_summary(summary):
     response = submit(query, parameters)
     return response
 
+def find_urlpreview(url):
+    query = '''
+        MATCH (u:urlPreview)
+        WHERE u.url=$url
+        RETURN u as db_return
+    '''
+    parameters={'url': url}
+    response = submit(query, parameters)
+    return response
+
 def add_collection_with_chunks(collection_id, name, source_type, source_path, date, intro_audio, outro_audio, intro_text, trigger_warning, num_chunks, chunk_sequence):
     # hash = hashlib.md5(name[0].encode("utf-8"))
     # collection_id = hash.hexdigest()
@@ -486,6 +496,31 @@ def extract_metadata_from_url(url_metadata):
     
     query = '''
         CREATE (u:urlPreview {title: $title, description: $description, image: $image, timestamp: $timestamp, url: $url})
+        RETURN u as db_return
+    '''
+    parameters = {
+        'title': url_metadata['title'],
+        'description': url_metadata['description'],
+        'image': url_metadata['image'],
+        'timestamp': date_time,
+        'url': url_metadata['url']
+    }
+    response = submit(query, parameters)
+    return response
+
+def update_urlPreview_data(url_metadata):
+    now = datetime.now()
+    date_time = now.strftime("%d/%m/%Y, %H:%M:%S")
+
+    query = '''
+        Match (u:urlPreview {url: $url})
+
+        Set u.title = $title,
+        u.description = $description, 
+        u.image = $image,
+        u.timestamp = $timestamp,
+        u.url = $url
+
         RETURN u as db_return
     '''
     parameters = {

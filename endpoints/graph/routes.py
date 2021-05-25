@@ -10,6 +10,9 @@ from endpoints.graph.helper import *
 from flask import Blueprint
 graph_routes = Blueprint('graph', __name__)
 
+# api_base_url = "http://127.0.0.1:5000"
+api_base_url = "http://ecchr.metasphere.xyz:2342"
+
 @graph_routes.route('/find', methods=['POST', 'GET'])
 def return_node():
     search = get_single_json_value()
@@ -344,7 +347,6 @@ def disconnect_entity():
 @graph_routes.route('/add/urlpreview', methods=['POST', 'GET'])
 def extract_metadata():
     query = parse_json_from_request()
-    api_base_url = "http://127.0.0.1:5000"
     urlpreview_endpoint = api_base_url + "/text/extract/urlpreview"
     response = requests.post(
                 urlpreview_endpoint,
@@ -358,12 +360,26 @@ def extract_metadata():
     response = respond_with_json(extracted_metadata)
     return response
 
+@graph_routes.route('/update/urlpreview', methods=['POST', 'GET'])
+def update_metadata():
+    query = parse_json_from_request()
+    response_find_url = find_urlpreview(query['url'])
+    
+    if(response_find_url['status'] == 'success'):
+        urlpreview_endpoint = api_base_url + "/text/extract/urlpreview"
+        response = requests.post(
+                    urlpreview_endpoint,
+                    data=json.dumps(query),
+                    headers={
+                        'Content-type': 'application/json'
+                    }
+                )
+        print(response.json())
+        updated_urlPreview_data = update_urlPreview_data(response.json())
+        print('break 3')
+        response = respond_with_json(updated_urlPreview_data)
+    else:
+        response = response_find_url
+    
+    return response
 
-# TODO: add missing endpoints:
-#
-# /graph/add/chunk ({chunk_id, chunk_text, etc.} (json object))
-# /graph/add/summary (chunk_id, summary (json object))
-# /graph/add/entity (chunk_id, entity (json object))
-#
-# /graph/connect/entity
-# /graph/conntect/chunks
