@@ -355,7 +355,6 @@ def extract_metadata():
                     'Content-type': 'application/json'
                 }
             )
-    print(response.json())
     extracted_metadata = extract_metadata_from_url(response.json())
     response = respond_with_json(extracted_metadata)
     return response
@@ -374,9 +373,7 @@ def update_metadata():
                         'Content-type': 'application/json'
                     }
                 )
-        print(response.json())
         updated_urlPreview_data = update_urlPreview_data(response.json())
-        print('break 3')
         response = respond_with_json(updated_urlPreview_data)
     else:
         response = response_find_url
