@@ -15,12 +15,32 @@ def return_ner():
     response = respond_with_json(ner_output)
     return response
 
+
+@text_routes.route('/extract/urlpreview', methods=['POST', 'GET'])
+def return_urlpreview():
+    url = parse_json_from_request()
+    preview = url_preview(url['url'])
+    response = respond_with_json(preview)
+    return response
+
 @text_routes.route('/similarities', methods=['POST', 'GET'])
 def return_similarities():
-    text, num_similar_chunks, similarity_score_treshold = parse_json('similarity')
-    similar_chunks = similarity_tf(text, num_similar_chunks, similarity_score_treshold)
+    (text, num_similar_chunks, similarity_score_treshold) = parse_json('similarity')
+    # similar_chunks = similarity_tf(text, num_similar_chunks, similarity_score_treshold)
+    similar_chunks = similarity_huggingface(text, num_similar_chunks, similarity_score_treshold)
     response = respond_with_json(similar_chunks)
     return response
+
+
+@text_routes.route('/summarize/chunk_sequence', methods=['POST', 'GET'])
+def return_summarize_chunk_sequence():
+    if request_type(request) == 'application/json':
+        chunk_sequence = parse_json('summarize_chunk_sequence')
+        chunks = summarize_chunk_sequence(chunk_sequence)
+
+    if request_type(request) == 'application/json':
+        response = respond_with_json(chunks)
+        return response
 
 @text_routes.route('/summarize', methods=['POST', 'GET'])
 def return_summaries():
@@ -37,6 +57,7 @@ def return_summaries():
         num_summaries,
         response_type
     )
+
 
 # TODO: wrap request generation into function to get rid of repeating code
 # TODO: bugfixing

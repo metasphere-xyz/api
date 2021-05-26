@@ -1,7 +1,88 @@
 from config import *
 
 def preprocess(text):
-    return text.replace("\r", "\n ").replace("\n", " ").replace("\s\s+", " ").strip()
+    text_clean = text.replace("\r", "\n ")\
+        .replace("\n", " ") \
+        .replace("\s\s+", " ") \
+        .replace('"', '') \
+        .replace("’s", "") \
+        .replace("...", "") \
+        .replace('" ', "") \
+        .replace('"', "") \
+        .replace(" - ", "-") \
+        .strip()
+    return text_clean
+
+def remove_stopwords_from_string(text):
+    text_clean = ''
+    for word in text.lower().split():
+        if word not in stopwords:
+            text_clean += word + " "
+    return text_clean
+
+def url_preview(url):
+    preview = link_preview(url)
+
+    response_urlpreview = {
+        "url": url,
+        "title": preview.title,
+        "description": preview.description,
+        "image": preview.image,
+    }
+    return response_urlpreview
+
+def compute_base_embeddings():
+    print(f"[bold]Loading corpus embeddings.[/bold]")
+    query = '''
+        MATCH (c:Chunk)
+        RETURN c.chunk_id, c.text
+    '''
+    print(eye, f"Retrieving all chunks...")
+    result = graph.run(query).data()
+
+    documents = []
+    documents_clean = []
+    chunk_list = []
+    length_corpus = 0
+    num_chunks = len(result)
+    print(checkmark, f"Successfully loaded {num_chunks} chunks.")
+
+    if len(result) > 1:
+        for chunk in result:
+            chunk_text = preprocess(chunk['c.text'])
+            chunk_text_clean = remove_stopwords_from_string(chunk_text)
+            length_corpus += 1
+            documents.append(chunk_text)
+            documents_clean.append(chunk_text_clean)
+            chunk_list.append(chunk['c.chunk_id'])
+
+    print(checkmark, f"Successfully processed {length_corpus}/{num_chunks} chunks.")
+    #Load AutoModel from huggingface model repository
+    print(eye, f"Loading tokenizer...")
+    tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
+    print(checkmark, f"Successfully loaded tokenizer.")
+    print(eye, f"Loading model...")
+    model = AutoModel.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
+    print(checkmark, f"Successfully loaded model.")
+
+    #Tokenize sentences
+    print(eye, f"Tokenizing corpus...")
+    if length_corpus > 1:
+        encoded_input = tokenizer(documents_clean, padding=True, truncation=True, max_length=128, return_tensors='pt')
+    else:
+        encoded_input = tokenizer([""], padding=True, truncation=True, max_length=128, return_tensors='pt')
+
+    # encoded_input_sentence = tokenizer(text, padding=True, truncation=True, max_length=128, return_tensors='pt')
+    print(checkmark, f"Successfully tokenized.")
+
+    #Compute token embeddings
+    print(eye, f"Computing base embeddings...")
+    with torch.no_grad():
+        model_output = model(**encoded_input)
+        sentence_embeddings = model_output[0][:,0]
+
+    print(checkmark, f"Successfully computed {len(sentence_embeddings)} embeddings")
+    return documents, tokenizer, model, sentence_embeddings
 
 def summarizer_pipeline(text, min_length, max_length):
     summarizer = pipeline(
@@ -58,6 +139,9 @@ def summarize(text, aim, deviation, num_summaries, response_type):
 
 
     # md5.update(text.encode("utf-8"))
+    # TODO: add sentence segmentation and only return full sentences:
+    # https://spacy.io/usage/linguistic-features#sbd
+    # Alternatively: pass through bert extractive summarizer before processing to filter out most valuable sentence before processing
     hash = hashlib.md5(text.encode("utf-8"))
     chunk_id = hash.hexdigest()
     text_length = len(list(text.split()))
@@ -73,7 +157,7 @@ def summarize(text, aim, deviation, num_summaries, response_type):
 
     response = {
         "chunk_id": chunk_id,
-        "summary": [
+        "summaries": [
         ]
     }
 
@@ -96,7 +180,7 @@ def summarize(text, aim, deviation, num_summaries, response_type):
         hash = hashlib.md5(summary.encode("utf-8"))
         summary_id = hash.hexdigest()
 
-        response["summary"].append({
+        response["summaries"].append({
             "text": summary,
             "summary_id": summary_id,
             "compression": compression,
@@ -107,23 +191,120 @@ def summarize(text, aim, deviation, num_summaries, response_type):
     return response
 
 
+def sequence_by_speaker(chunk_sequence):
+    try:
+        json_loads(chunk_sequence)
+    except:
+        print ("error")
+
+    if len(chunk_sequence) > 1:
+        chunks_by_speaker = []
+
+        sequence = 0
+        speaker = ""
+
+        for chunk in chunk_sequence:
+            if speaker != chunk["speaker"]:
+                speaker = chunk["speaker"]
+                sequence = len(chunks_by_speaker)
+                chunks_by_speaker.append([{}])
+                chunks_by_speaker[sequence] = []
+            chunks_by_speaker[sequence].append(dict(chunk))
+
+        return json.dumps(chunks_by_speaker)
+
+# %% summarize chunk sequence
+# Takes a chunk sequence as argument, joins contributions per speaker, summarizes chunk sequence per speaker
+
+
+def summarize_chunk_sequence(chunk_sequence):
+    response = {
+        "chunk_sequence": []
+    }
+
+    chunks_by_speaker = json.loads(sequence_by_speaker(chunk_sequence))
+
+    for sequence in chunks_by_speaker:
+        speaker = sequence[0]["speaker"]
+        contribution = ""
+        print(speaker)
+
+        for chunk in sequence:
+            contribution += chunk["text"] + " "
+
+        num_chunks = len(sequence)
+        print ("num_chunks: " + str(num_chunks))
+        ratio = int(num_chunks)/int(summary_percentage_document)
+        print ("ratio: " + str(ratio))
+        print (preprocess(contribution))
+
+        # summaries = sentence_summarizer(preprocess(contribution), ratio=ratio)
+        summaries = nlp(sentence_summarizer(preprocess(contribution), num_sentences=0, min_length=2))
+
+        for sentence in summaries.sents:
+            for chunk in sequence:
+                if sentence.text in chunk["text"]:
+                    response["chunk_sequence"].append(chunk)
+
+    return response
+
 # %% NER SpaCy
 def ner(text):
-    doc = nlp(text)
+    # TODO: port coreference resolution from media/processors/pushCollection.py
+    doc = nlp(preprocess(text))
     hash = hashlib.md5(text.encode("utf-8"))
     chunk_id = hash.hexdigest()
 
-    ner_proccessed = {
+    response = {
         "chunk_id": chunk_id,
         "text": text,
-        "entities": {
-
-        }
+        "entities": []
     }
-    for ent in doc.ents:
-        ner_proccessed['entities'][ent.text]=ent.label_
 
-    return ner_proccessed
+    entities = {}
+    entity_names = ''
+    nouns = []
+
+    def clean_up(entity_name):
+        cleaned_entity = entity_name \
+            .replace("the ", "") \
+            .replace("The ", "") \
+            .replace("this ", "") \
+            .replace("’s", "") \
+            .replace("...", "") \
+            .replace('" ', "") \
+            .replace('"', "") \
+            .replace(" - ", "-") \
+            .strip()
+        return cleaned_entity
+
+    # find hardcoded entities
+    hardcoded_entities = re.findall('\"((\w+\W)*\w+)', text)
+    for entity in hardcoded_entities:
+        found_entity = entity[0].replace('\\', '')
+        entities.update({clean_up(found_entity): 'HARDCODED'})
+        entity_names += clean_up(found_entity)
+
+    for entity in doc.ents:
+        if entity.label_ in accepted_entity_labels:
+            entities.update({clean_up(entity.lemma_): entity.label_})
+            entity_names += clean_up(entity.lemma_)
+
+    # for noun in doc.noun_chunks:
+    #     if noun.root.lemma_.lower() not in stopwords and not noun.root.lemma_.isnumeric():
+    #         if noun.root.lemma_ not in entity_names:
+    #             entities.update({clean_up(noun.root.lemma_): 'NOUN'})
+    #             entity_names += clean_up(noun.root.lemma_)
+
+    for (entity_name, entity_label) in entities.items():
+        if entity_name != '':
+            response["entities"].append({
+                "entity_name": entity_name,
+                "entity_label": entity_label
+            })
+
+    print(response)
+    return response
 
 # %% NER Huggingface
 def ner_huggingface(text):
@@ -131,32 +312,80 @@ def ner_huggingface(text):
     return ner_huggingface_processed
 
 #%% Text Similarity
-def similarity_tf(text, num_similar_chunks, similarity_score_treshold):
-    # TODO: port to huggingface:
-    # https://huggingface.co/sentence-transformers/bert-base-nli-cls-token
-    #
-    # model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
-    # model = hub.load("/Users/malte/Desktop/universal-sentence-encoder_4")
-    model = hub.load("models/universal-sentence-encoder_4")
+# def similarity_tf(text, num_similar_chunks, similarity_score_treshold):
+#     # model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
+#     # model = hub.load("/Users/malte/Desktop/universal-sentence-encoder_4")
+#     model = hub.load("models/universal-sentence-encoder_4")
+#
+#     # TODO: add filter for type (chunk, summary, entity)
+#     query = '''
+#         MATCH (c:Chunk)
+#         RETURN c.chunk_id, c.text
+#     '''
+#     result = graph.run(query).data()
+#
+#     documents = []
+#     chunk_list = []
+#
+#     for chunks in result:
+#         documents.append(chunks['c.text'])
+#         chunk_list.append(chunks['c.chunk_id'])
+#
+#     base_embeddings = model([text])
+#     embeddings = model(documents)
+#
+#     scores = cosine_similarity(base_embeddings, embeddings).flatten()
+#
+#     sorted_scores_indexes = sorted(((value, index) for index, value in enumerate(scores)), reverse=True)
+#     print(sorted_scores_indexes)
+#
+#     hash = hashlib.md5(text.encode("utf-8"))
+#     chunk_id = hash.hexdigest()
+#
+#     response_similarity = {
+#         "chunk_id": chunk_id,
+#         "text": text,
+#         "similarity": [
+#
+#         ]
+#     }
+#
+#     for i in range(num_similar_chunks):
+#         index = sorted_scores_indexes[i][1]
+#         chunk_id = chunk_list[index]
+#         chunk_text = documents[index]
+#         score = int(round(sorted_scores_indexes[i][0],2)*100)
+#         if 100 > score >= int(similarity_score_treshold):
+#             response_similarity['similarity'].append(
+#                 {
+#                     "chunk_id": chunk_id,
+#                     "score": score,
+#                     "text": chunk_text
+#                 }
+#             )
+#     return response_similarity
 
-    # TODO: add filter for type (chunk, summary, entity)
-    query = '''
-        MATCH (c:Chunk)
-        RETURN c.chunk_id, c.text
-    '''
-    result = graph.run(query).data()
+# %% Text Similarity with HUGGINGFACE
+def similarity_huggingface(text, num_similar_chunks, similarity_score_treshold):
 
-    documents = []
-    chunk_list = []
+    print(f"[bold]Finding similar chunks.[/bold]")
+    print(f"{text}")
 
-    for chunks in result:
-        documents.append(chunks['c.text'])
-        chunk_list.append(chunks['c.chunk_id'])
+    print(eye, f"Tokenizing...")
+    text_without_stopwords = remove_stopwords_from_string(text)
+    print(text_without_stopwords)
+    encoded_input_sentence = tokenizer(text_without_stopwords, padding=True, truncation=True, max_length=128, return_tensors='pt')
+    print(checkmark, f"Successfully tokenized.")
 
-    base_embeddings = model([text])
-    embeddings = model(documents)
+    print(eye, f"Computing embeddings...")
+    with torch.no_grad():
+        sentence_output = model(**encoded_input_sentence)
+        base_embeddings = sentence_output[0][:,0]
+    print(checkmark, f"Successfully computed embeddings.")
 
-    scores = cosine_similarity(base_embeddings, embeddings).flatten()
+    print(eye, f"Computing similarity...")
+    scores = cosine_similarity(base_embeddings, sentence_embeddings).flatten()
+    print(checkmark, f"Successfully computed similarity.")
 
     sorted_scores_indexes = sorted(((value, index) for index, value in enumerate(scores)), reverse=True)
     print(sorted_scores_indexes)
@@ -167,7 +396,7 @@ def similarity_tf(text, num_similar_chunks, similarity_score_treshold):
     response_similarity = {
         "chunk_id": chunk_id,
         "text": text,
-        "similarity": [
+        "similar_chunks": [
 
         ]
     }
@@ -177,13 +406,13 @@ def similarity_tf(text, num_similar_chunks, similarity_score_treshold):
         chunk_id = chunk_list[index]
         chunk_text = documents[index]
         score = int(round(sorted_scores_indexes[i][0],2)*100)
-        if 100 > score >= int(similarity_score_treshold):
-            response_similarity['similarity'].append(
+        if 98 > score >= int(similarity_score_treshold):
+            response_similarity['similar_chunks'].append(
                 {
                     "chunk_id": chunk_id,
                     "score": score,
                     "text": chunk_text
                 }
             )
+    print(response_similarity)
     return response_similarity
-# %%

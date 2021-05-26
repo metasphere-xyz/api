@@ -26,3 +26,26 @@ def parse_json(endpoint):
             if not text:
                 raise_error("no text specified")
             return text, aim, deviation, num_summaries
+        elif endpoint == 'summarize_chunk_sequence':
+            chunk_sequence = []
+            try:
+                chunk_sequence = request.get_json()['chunk_sequence']
+            except Exception as ex:
+                raise_error("no chunk sequence specified")
+
+            if len(chunk_sequence) < 1:
+                raise_error("no chunk sequence specified")
+            return chunk_sequence
+
+def parse_json_from_request():
+    if request_type(request) == 'application/json':
+        try:
+            # make sure we get json in the first place
+            request_json = request.get_json()
+        except:
+            return 'could not unpack json'
+        finally:
+            values_from_json = json.loads(str(json.dumps(request_json)))
+            return values_from_json
+    else:
+        return 'json expected'
