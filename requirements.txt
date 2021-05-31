@@ -14,3 +14,4 @@ py2neo
 fuzzy-match>=0.0.1
 bert-extractive-summarizer>=0.7.0
 linkpreview>=0.2.0
+flask-cors

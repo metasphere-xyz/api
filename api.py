@@ -7,6 +7,7 @@ api.config["SERVER_NAME"] = 'ecchr.metasphere.xyz:2342'
 
 # Standard routes
 @api.route('/', methods=['GET', 'POST'])
+@cross_origin(origin='localhost',headers=['Content-Type', 'Authorization'])
 def welcome():
     try:
         return {
