@@ -27,6 +27,7 @@ import requests
 from flask import *
 import json
 from http import HTTPStatus
+from flask_cors import CORS, cross_origin
 
 # calculations
 import math
