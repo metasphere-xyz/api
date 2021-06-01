@@ -11,8 +11,8 @@ from flask import Blueprint
 graph_routes = Blueprint('graph', __name__)
 # CORS(graph_routes)
 
-api_base_url = "http://127.0.0.1:5000"
-# api_base_url = "http://ecchr.metasphere.xyz:2342"
+# api_base_url = "http://127.0.0.1:5000"
+api_base_url = "https://ecchr.metasphere.xyz:2342"
 
 
 @graph_routes.route('/find', methods=['POST', 'GET'])
