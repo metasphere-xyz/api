@@ -38,4 +38,4 @@ api.register_blueprint(graph_routes, url_prefix='/graph')
 
 # Run API
 if __name__ == '__main__':
-    api.run(use_reloader=False)
+    api.run(use_reloader=False, ssl_context=('/home/ecchr/certificates/https/public.crt', '/home/ecchr/certificates/https/private.key'))
