@@ -8,10 +8,11 @@ api.config["DEBUG"] = True
 api.config["SERVER_NAME"] = 'ecchr.metasphere.xyz:2342'
 
 # Standard routes
+# CORS(api, resources=r'/text/*')
 
 
 @api.route('/', methods=['GET', 'POST'])
-@cross_origin(origin='localhost',headers=['Content-Type', 'Authorization'])
+@cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def welcome():
     try:
         return {
