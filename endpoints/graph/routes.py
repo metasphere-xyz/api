@@ -10,8 +10,8 @@ from endpoints.graph.helper import *
 from flask import Blueprint
 graph_routes = Blueprint('graph', __name__)
 
-# api_base_url = "http://127.0.0.1:5000"
-api_base_url = "http://ecchr.metasphere.xyz:2342"
+api_base_url = "http://127.0.0.1:5000"
+# api_base_url = "http://ecchr.metasphere.xyz:2342"
 
 @graph_routes.route('/find', methods=['POST', 'GET'])
 def return_node():
