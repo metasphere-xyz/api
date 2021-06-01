@@ -7,6 +7,8 @@ from endpoints.text.response import *
 
 from flask import Blueprint
 text_routes = Blueprint('text', __name__)
+CORS(text_routes)
+
 
 @text_routes.route('/extract/entities', methods=['POST', 'GET'])
 def return_ner():
@@ -23,11 +25,13 @@ def return_urlpreview():
     response = respond_with_json(preview)
     return response
 
+
 @text_routes.route('/similarities', methods=['POST', 'GET'])
 def return_similarities():
     (text, num_similar_chunks, similarity_score_treshold) = parse_json('similarity')
     # similar_chunks = similarity_tf(text, num_similar_chunks, similarity_score_treshold)
-    similar_chunks = similarity_huggingface(text, num_similar_chunks, similarity_score_treshold)
+    similar_chunks = similarity_huggingface(
+        text, num_similar_chunks, similarity_score_treshold)
     response = respond_with_json(similar_chunks)
     return response
 
@@ -41,6 +45,7 @@ def return_summarize_chunk_sequence():
     if request_type(request) == 'application/json':
         response = respond_with_json(chunks)
         return response
+
 
 @text_routes.route('/summarize', methods=['POST', 'GET'])
 def return_summaries():

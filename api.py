@@ -1,3 +1,5 @@
+from endpoints.graph.routes import graph_routes
+from endpoints.text.routes import text_routes
 from config import *
 
 # Configuration
@@ -6,8 +8,11 @@ api.config["DEBUG"] = True
 api.config["SERVER_NAME"] = 'ecchr.metasphere.xyz:2342'
 
 # Standard routes
+# CORS(api, resources=r'/text/*')
+
+
 @api.route('/', methods=['GET', 'POST'])
-@cross_origin(origin='localhost',headers=['Content-Type', 'Authorization'])
+@cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def welcome():
     try:
         return {
@@ -21,13 +26,12 @@ def welcome():
         traceback.print_exc()
         return {'status': 'failed', 'error': str(ex)}
 
+
 # Endpoints
 # /text/
-from endpoints.text.routes import text_routes
 api.register_blueprint(text_routes, url_prefix='/text')
 
 # /graph
-from endpoints.graph.routes import graph_routes
 api.register_blueprint(graph_routes, url_prefix='/graph')
 
 # TODO: add other endpoints
